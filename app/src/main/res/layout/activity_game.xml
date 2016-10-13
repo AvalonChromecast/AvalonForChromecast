@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+
+    android:background="@color/blue"
+
+    tools:context="edu.wisc.ece.avalonforchromecast.GameActivity">
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Your Character"
+        android:id="@+id/characterView"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pass"
+        android:id="@+id/passButton"
+        android:layout_centerVertical="true"
+        android:layout_alignLeft="@+id/approveButton"
+        android:layout_alignStart="@+id/approveButton" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Fail"
+        android:id="@+id/failButton"
+        android:layout_alignTop="@+id/passButton"
+        android:layout_alignLeft="@+id/rejectButton"
+        android:layout_alignStart="@+id/rejectButton" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Approve"
+        android:id="@+id/approveButton"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/characterView"
+        android:layout_toStartOf="@+id/characterView" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reject"
+        android:id="@+id/rejectButton"
+        android:layout_alignTop="@+id/approveButton"
+        android:layout_toRightOf="@+id/characterView"
+        android:layout_toEndOf="@+id/characterView" />
+
+</RelativeLayout>
