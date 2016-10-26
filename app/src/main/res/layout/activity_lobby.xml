@@ -19,4 +19,15 @@
         android:layout_marginBottom="141dp"
         android:id="@+id/button"
         android:onClick="startGame" />
+
+    <TextView
+        android:text="Lobby"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="67dp"
+        android:id="@+id/textView2"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textSize="36sp" />
 </RelativeLayout>
