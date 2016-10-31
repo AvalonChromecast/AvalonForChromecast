@@ -1,5 +1,10 @@
 <resources>
     <string name="app_name">AvalonForChromecast</string>
+    <string name="media_route_menu_title">CAST</string>
+    <string name="app_id">794B7BBF</string>
+    <string name="message_to_cast">MESSAGE TO CAST</string>
+    <string name="namespace">urn:x-cast:com.example.custom</string>
+    <string name="instructions">INSTRUCTIONS</string>
 
     <color name="blue">#0C6DEF</color>
     <color name="white">#FFFFFF</color>

@@ -1,10 +1,10 @@
 package edu.wisc.ece.avalonforchromecast;
 
-import android.app.Activity;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -12,10 +12,10 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
     }
 
-    /* called when user clicks connect button */
+    /* called when pressing the start game button */
     public void connectToCast(View view){
-        // connect user to chromecast
+        // connect to the chromecast
 
-        // move user to welcome screen
+        // change activity to welcome activity
     }
 }
