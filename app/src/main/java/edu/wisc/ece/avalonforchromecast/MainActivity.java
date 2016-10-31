@@ -100,6 +100,13 @@ public class MainActivity extends ActionBarActivity {
         startActivityForResult(intent, REQUEST_CODE);
     }
 
+    /* called when pressing the start game button */
+    public void connectToCast(View view){
+        // connect to the chromecast
+
+        // change activity to welcome activity
+    }
+
     private void sendToCast(){
         sendMessage("hello world");
     }
