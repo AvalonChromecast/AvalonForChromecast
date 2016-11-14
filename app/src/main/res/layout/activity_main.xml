@@ -29,15 +29,7 @@
         android:text="Connect"
         android:id="@+id/connectButton"
         android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
-
-    <Button
-        android:id="@+id/voiceButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_gravity="center"
-        android:stateListAnimator="@null"
-        android:background="@drawable/voice_button"/>
+        android:layout_centerHorizontal="true"
+        android:onClick="connectToCast" />
 
 </RelativeLayout>

@@ -1,412 +1,163 @@
 package edu.wisc.ece.avalonforchromecast;
 
-import com.google.android.gms.cast.ApplicationMetadata;
-import com.google.android.gms.cast.Cast;
-import com.google.android.gms.cast.Cast.ApplicationConnectionResult;
-import com.google.android.gms.cast.Cast.MessageReceivedCallback;
-import com.google.android.gms.cast.CastDevice;
-import com.google.android.gms.cast.CastMediaControlIntent;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.cast.games.GameManagerClient;
+import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 
-import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
-import android.speech.RecognizerIntent;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.MediaRouteActionProvider;
-import android.support.v7.media.MediaRouteSelector;
-import android.support.v7.media.MediaRouter;
-import android.support.v7.media.MediaRouter.RouteInfo;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.Toast;
 
-import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
- * Main activity to send messages to the receiver.
+ * The main activity. Fragments are loaded for the various stages in the UI.
  */
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppCompatActivity implements Observer {
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String TAG = "MainActivity";
 
-    private static final int REQUEST_CODE = 1;
+    private CastConnectionFragment mCastConnectionFragment;
+    private LobbyFragment mLobbyFragment;
+    private DrawingFragment mDrawingFragment;
+    private int mPlayerState = GameManagerClient.PLAYER_STATE_UNKNOWN;
+    private String mPlayerName;
 
-    private MediaRouter mMediaRouter;
-    private MediaRouteSelector mMediaRouteSelector;
-    private MediaRouter.Callback mMediaRouterCallback;
-    private CastDevice mSelectedDevice;
-    private GoogleApiClient mApiClient;
-    private Cast.Listener mCastListener;
-    private ConnectionCallbacks mConnectionCallbacks;
-    private ConnectionFailedListener mConnectionFailedListener;
-    private HelloWorldChannel mHelloWorldChannel;
-    private boolean mApplicationStarted;
-    private boolean mWaitingForReconnect;
-    private String mSessionId;
+    private CastConnectionManager mCastConnectionManager;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.main_activity);
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setBackgroundDrawable(new ColorDrawable(
-                getResources().getColor(android.R.color.transparent)));
+        // Set up Toolbar
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        // When the user clicks on the button, use Android voice recognition to
-        // get text
-        Button voiceButton = (Button) findViewById(R.id.voiceButton);
-        voiceButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startVoiceRecognitionActivity();
-            }
-        });
-        Button connectButton = (Button) findViewById(R.id.connectButton);
-        connectButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                sendToCast();
-            }
-        });
+        mCastConnectionManager = new CastConnectionManager(this,
+                getResources().getString(R.string.app_id));
+        mCastConnectionFragment = new CastConnectionFragment();
+        mDrawingFragment = new DrawingFragment();
+        mLobbyFragment = new LobbyFragment();
 
-        // Configure Cast device discovery
-        mMediaRouter = MediaRouter.getInstance(getApplicationContext());
-        mMediaRouteSelector = new MediaRouteSelector.Builder()
-                .addControlCategory(CastMediaControlIntent.categoryForCast(getResources()
-                        .getString(R.string.app_id))).build();
-        mMediaRouterCallback = new MyMediaRouterCallback();
+        updateFragments();
+    }
+
+    public CastConnectionManager getCastConnectionManager() {
+        return mCastConnectionManager;
     }
 
     /**
-     * Android voice recognition
+     * Called when the options menu is first created.
      */
-    private void startVoiceRecognitionActivity() {
-        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.message_to_cast));
-        startActivityForResult(intent, REQUEST_CODE);
-    }
-
-    /* called when pressing the start game button */
-    public void connectToCast(View view){
-        // connect to the chromecast
-
-        // change activity to welcome activity
-    }
-
-    private void sendToCast(){
-        sendMessage("hello world");
-    }
-
-    /*
-     * Handle the voice recognition response
-     *
-     * @see android.support.v4.app.FragmentActivity#onActivityResult(int, int,
-     * android.content.Intent)
-     */
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
-            ArrayList<String> matches = data.getStringArrayListExtra(
-                    RecognizerIntent.EXTRA_RESULTS);
-            if (matches.size() > 0) {
-                Log.d(TAG, matches.get(0));
-                sendMessage(matches.get(0));
-            }
-        }
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        // Start media router discovery
-        mMediaRouter.addCallback(mMediaRouteSelector, mMediaRouterCallback,
-                MediaRouter.CALLBACK_FLAG_REQUEST_DISCOVERY);
-    }
-
-    @Override
-    protected void onStop() {
-        // End media router discovery
-        mMediaRouter.removeCallback(mMediaRouterCallback);
-        super.onStop();
-    }
-
-    @Override
-    public void onDestroy() {
-        Log.d(TAG, "onDestroy");
-        teardown(true);
-        super.onDestroy();
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.main, menu);
         MenuItem mediaRouteMenuItem = menu.findItem(R.id.media_route_menu_item);
-        MediaRouteActionProvider mediaRouteActionProvider
-                = (MediaRouteActionProvider) MenuItemCompat
-                .getActionProvider(mediaRouteMenuItem);
-        // Set the MediaRouteActionProvider selector for device discovery.
-        mediaRouteActionProvider.setRouteSelector(mMediaRouteSelector);
+        MediaRouteActionProvider mediaRouteActionProvider =
+                (MediaRouteActionProvider) MenuItemCompat.getActionProvider(mediaRouteMenuItem);
+        if (mediaRouteActionProvider == null) {
+            Log.w(TAG, "mediaRouteActionProvider is null!");
+            return false;
+        }
+        mediaRouteActionProvider.setRouteSelector(mCastConnectionManager.getMediaRouteSelector());
         return true;
     }
 
-    /**
-     * Callback for MediaRouter events
-     */
-    private class MyMediaRouterCallback extends MediaRouter.Callback {
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mCastConnectionManager.startScan();
+        mCastConnectionManager.addObserver(this);
+        updateFragments();
+    }
 
-        @Override
-        public void onRouteSelected(MediaRouter router, RouteInfo info) {
-            Log.d(TAG, "onRouteSelected");
-            // Handle the user route selection.
-            mSelectedDevice = CastDevice.getFromBundle(info.getExtras());
-
-            launchReceiver();
-        }
-
-        @Override
-        public void onRouteUnselected(MediaRouter router, RouteInfo info) {
-            Log.d(TAG, "onRouteUnselected: info=" + info);
-            teardown(false);
-            mSelectedDevice = null;
-        }
+    @Override
+    protected void onPause() {
+        mCastConnectionManager.stopScan();
+        mCastConnectionManager.deleteObserver(this);
+        super.onPause();
     }
 
     /**
-     * Start the receiver app
+     * Called when the cast connection changes.
      */
-    private void launchReceiver() {
-        try {
-            mCastListener = new Cast.Listener() {
-
+    @Override
+    public void update(Observable object, Object data) {
+        final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
+        if (mCastConnectionManager.isConnectedToReceiver()) {
+            PendingResult<GameManagerClient.GameManagerResult> result =
+                    gameManagerClient.sendPlayerAvailableRequest(null);
+            result.setResultCallback(new ResultCallback<GameManagerClient.GameManagerResult>() {
                 @Override
-                public void onApplicationDisconnected(int errorCode) {
-                    Log.d(TAG, "application has stopped");
-                    teardown(true);
-                }
-
-            };
-            // Connect to Google Play services
-            mConnectionCallbacks = new ConnectionCallbacks();
-            mConnectionFailedListener = new ConnectionFailedListener();
-            Cast.CastOptions.Builder apiOptionsBuilder = Cast.CastOptions
-                    .builder(mSelectedDevice, mCastListener);
-            mApiClient = new GoogleApiClient.Builder(this)
-                    .addApi(Cast.API, apiOptionsBuilder.build())
-                    .addConnectionCallbacks(mConnectionCallbacks)
-                    .addOnConnectionFailedListener(mConnectionFailedListener)
-                    .build();
-
-            mApiClient.connect();
-        } catch (Exception e) {
-            Log.e(TAG, "Failed launchReceiver", e);
-        }
-    }
-
-    /**
-     * Google Play services callbacks
-     */
-    private class ConnectionCallbacks implements
-            GoogleApiClient.ConnectionCallbacks {
-
-        @Override
-        public void onConnected(Bundle connectionHint) {
-            Log.d(TAG, "onConnected");
-
-            if (mApiClient == null) {
-                // We got disconnected while this runnable was pending
-                // execution.
-                return;
-            }
-
-            try {
-                if (mWaitingForReconnect) {
-                    mWaitingForReconnect = false;
-
-                    // Check if the receiver app is still running
-                    if ((connectionHint != null)
-                            && connectionHint.getBoolean(Cast.EXTRA_APP_NO_LONGER_RUNNING)) {
-                        Log.d(TAG, "App  is no longer running");
-                        teardown(true);
+                public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
+                    if (gameManagerResult.getStatus().isSuccess()) {
+                        Log.d(TAG, "Player ID: " + gameManagerResult.getPlayerId());
+                        mPlayerState = gameManagerClient.getCurrentState().getPlayer(
+                                gameManagerResult.getPlayerId()).getPlayerState();
                     } else {
-                        // Re-create the custom message channel
-                        try {
-                            Cast.CastApi.setMessageReceivedCallbacks(
-                                    mApiClient,
-                                    mHelloWorldChannel.getNamespace(),
-                                    mHelloWorldChannel);
-                        } catch (IOException e) {
-                            Log.e(TAG, "Exception while creating channel", e);
-                        }
+                        mCastConnectionManager.disconnectFromReceiver(false);
+                        Utils.showErrorDialog(MainActivity.this,
+                                gameManagerResult.getStatus().getStatusMessage());
                     }
-                } else {
-                    // Launch the receiver app
-                    Cast.CastApi.launchApplication(mApiClient, getString(R.string.app_id), false)
-                            .setResultCallback(
-                                    new ResultCallback<Cast.ApplicationConnectionResult>() {
-                                        @Override
-                                        public void onResult(
-                                                ApplicationConnectionResult result) {
-                                            Status status = result.getStatus();
-                                            Log.d(TAG,
-                                                    "ApplicationConnectionResultCallback.onResult:"
-                                                            + status.getStatusCode());
-                                            if (status.isSuccess()) {
-                                                ApplicationMetadata applicationMetadata = result
-                                                        .getApplicationMetadata();
-                                                mSessionId = result.getSessionId();
-                                                String applicationStatus = result
-                                                        .getApplicationStatus();
-                                                boolean wasLaunched = result.getWasLaunched();
-                                                Log.d(TAG, "application name: "
-                                                        + applicationMetadata.getName()
-                                                        + ", status: " + applicationStatus
-                                                        + ", sessionId: " + mSessionId
-                                                        + ", wasLaunched: " + wasLaunched);
-                                                mApplicationStarted = true;
-
-                                                // Create the custom message
-                                                // channel
-                                                mHelloWorldChannel = new HelloWorldChannel();
-                                                try {
-                                                    Cast.CastApi.setMessageReceivedCallbacks(
-                                                            mApiClient,
-                                                            mHelloWorldChannel.getNamespace(),
-                                                            mHelloWorldChannel);
-                                                } catch (IOException e) {
-                                                    Log.e(TAG, "Exception while creating channel",
-                                                            e);
-                                                }
-
-                                                // set the initial instructions
-                                                // on the receiver
-                                                sendMessage(getString(R.string.instructions));
-                                            } else {
-                                                Log.e(TAG, "application could not launch");
-                                                teardown(true);
-                                            }
-                                        }
-                                    });
+                    updateFragments();
                 }
-            } catch (Exception e) {
-                Log.e(TAG, "Failed to launch application", e);
-            }
+            });
         }
-
-        @Override
-        public void onConnectionSuspended(int cause) {
-            Log.d(TAG, "onConnectionSuspended");
-            mWaitingForReconnect = true;
-        }
+        updateFragments();
     }
 
-    /**
-     * Google Play services callbacks
-     */
-    private class ConnectionFailedListener implements
-            GoogleApiClient.OnConnectionFailedListener {
-
-        @Override
-        public void onConnectionFailed(ConnectionResult result) {
-            Log.e(TAG, "onConnectionFailed ");
-
-            teardown(false);
+    private void updateFragments() {
+        if (isChangingConfigurations() || isFinishing() || isDestroyed()) {
+            return;
         }
-    }
 
-    /**
-     * Tear down the connection to the receiver
-     */
-    private void teardown(boolean selectDefaultRoute) {
-        Log.d(TAG, "teardown");
-        if (mApiClient != null) {
-            if (mApplicationStarted) {
-                if (mApiClient.isConnected() || mApiClient.isConnecting()) {
-                    try {
-                        Cast.CastApi.stopApplication(mApiClient, mSessionId);
-                        if (mHelloWorldChannel != null) {
-                            Cast.CastApi.removeMessageReceivedCallbacks(
-                                    mApiClient,
-                                    mHelloWorldChannel.getNamespace());
-                            mHelloWorldChannel = null;
-                        }
-                    } catch (IOException e) {
-                        Log.e(TAG, "Exception while removing channel", e);
-                    }
-                    mApiClient.disconnect();
-                }
-                mApplicationStarted = false;
-            }
-            mApiClient = null;
-        }
-        if (selectDefaultRoute) {
-            mMediaRouter.selectRoute(mMediaRouter.getDefaultRoute());
-        }
-        mSelectedDevice = null;
-        mWaitingForReconnect = false;
-        mSessionId = null;
-    }
-
-    /**
-     * Send a text message to the receiver
-     */
-    private void sendMessage(String message) {
-        if (mApiClient != null && mHelloWorldChannel != null) {
-            try {
-                Cast.CastApi.sendMessage(mApiClient,
-                        mHelloWorldChannel.getNamespace(), message).setResultCallback(
-                        new ResultCallback<Status>() {
-                            @Override
-                            public void onResult(Status result) {
-                                if (!result.isSuccess()) {
-                                    Log.e(TAG, "Sending message failed");
-                                }
-                            }
-                        });
-            } catch (Exception e) {
-                Log.e(TAG, "Exception while sending message", e);
-            }
+        Fragment fragment;
+        if (!mCastConnectionManager.isConnectedToReceiver()) {
+            mPlayerName = null;
+            fragment = mCastConnectionFragment;
         } else {
-            Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
+            if (mPlayerState == GameManagerClient.PLAYER_STATE_PLAYING) {
+                fragment = mDrawingFragment;
+            } else {
+                fragment = mLobbyFragment;
+            }
         }
+        getFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .commitAllowingStateLoss();
     }
 
-    /**
-     * Custom message channel
-     */
-    class HelloWorldChannel implements MessageReceivedCallback {
-
-        /**
-         * @return custom namespace
-         */
-        public String getNamespace() {
-            return getString(R.string.namespace);
-        }
-
-        /*
-         * Receive message from the receiver app
-         */
-        @Override
-        public void onMessageReceived(CastDevice castDevice, String namespace,
-                                      String message) {
-            Log.d(TAG, "onMessageReceived: " + message);
-        }
-
+    @Override
+    public void onBackPressed() {
+        // Do not pop any fragments, just act like the home button.
+        moveTaskToBack(true);
     }
 
+    public int getPlayerState() {
+        return mPlayerState;
+    }
+
+    public void setPlayerState(int state) {
+        mPlayerState = state;
+        updateFragments();
+    }
+
+    public String getPlayerName() {
+        return mPlayerName;
+    }
+
+    public void setPlayerName(String playerName) {
+        mPlayerName = playerName;
+    }
 }
