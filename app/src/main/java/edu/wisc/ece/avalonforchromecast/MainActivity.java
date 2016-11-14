@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
     private CastConnectionFragment mCastConnectionFragment;
     private LobbyFragment mLobbyFragment;
-    private DrawingFragment mDrawingFragment;
+    private PlayingFragment mPlayingFragment;
     private int mPlayerState = GameManagerClient.PLAYER_STATE_UNKNOWN;
     private String mPlayerName;
 
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         mCastConnectionManager = new CastConnectionManager(this,
                 getResources().getString(R.string.app_id));
         mCastConnectionFragment = new CastConnectionFragment();
-        mDrawingFragment = new DrawingFragment();
+        mPlayingFragment = new PlayingFragment();
         mLobbyFragment = new LobbyFragment();
 
         updateFragments();
@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
             fragment = mCastConnectionFragment;
         } else {
             if (mPlayerState == GameManagerClient.PLAYER_STATE_PLAYING) {
-                fragment = mDrawingFragment;
+                fragment = mPlayingFragment;
             } else {
                 fragment = mLobbyFragment;
             }

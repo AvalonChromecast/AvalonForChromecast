@@ -35,10 +35,10 @@ import java.util.Random;
  * Fragment for drawing.
  * Based on https://github.com/playgameservices/8bitartist
  */
-public class DrawingFragment extends GameFragment
+public class PlayingFragment extends GameFragment
         implements DrawView.DrawViewListener, View.OnClickListener {
 
-    private static final String TAG = "DrawingFragment";
+    private static final String TAG = "PlayingFragment";
 
     private static final int MAX_TIME = 30;
     private static final int MAX_WORDS = 10;
@@ -101,7 +101,7 @@ public class DrawingFragment extends GameFragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         // Inflate the layout for this fragment.
-        View view = inflater.inflate(R.layout.drawing_fragment, container, false);
+        View view = inflater.inflate(R.layout.playing_fragment, container, false);
 
         // Set up guesser progress
         mGuessProgress = (ProgressBar) view.findViewById(R.id.guessProgress);
