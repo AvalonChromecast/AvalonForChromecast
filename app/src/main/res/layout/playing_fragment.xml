@@ -1,115 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
 
-    <LinearLayout
-            android:id="@+id/gameplay_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_horizontal"
-            android:orientation="horizontal"
-            android:paddingBottom="@dimen/activity_vertical_margin"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:paddingTop="@dimen/activity_vertical_margin"
-            tools:visibility="visible"
-            tools:context=".DrawingActivity">
+    android:background="@color/blue"
 
-        <edu.wisc.ece.avalonforchromecast.DrawView
-                android:id="@+id/drawView"
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"/>
-
-        <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-            <RelativeLayout
-                    android:id="@+id/artistUI"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:visibility="visible"
-                    tools:visibility="gone">
-
-                <TextView
-                        android:id="@+id/guessWord"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:paddingLeft="10dp"
-                        android:textSize="20sp"
-                        android:textColor="@android:color/black"/>
+    tools:context="edu.wisc.ece.avalonforchromecast.GameFragment">
 
 
-                <LinearLayout
-                        android:id="@+id/clearDoneLayout"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:layout_alignParentBottom="true"
-                        android:orientation="vertical">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Your Role"
+        android:id="@+id/roleTextView"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
 
-                    <Button
-                            android:id="@+id/clearButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="clear"/>
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        />
 
-                    <Button
-                            android:id="@+id/doneButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="done"/>
-                </LinearLayout>
-            </RelativeLayout>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Fail"
+        android:id="@+id/failMissionButton"
+        android:layout_alignTop="@+id/passMissionButton"
+        android:layout_alignLeft="@+id/rejectSelectionButton"
+        android:layout_alignStart="@+id/rejectSelectionButton"
+        android:onClick="failMission" />
 
-            <RelativeLayout
-                    android:id="@+id/guesserUI"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    tools:visibility="visible">
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Approve"
+        android:id="@+id/approveSelectionButton"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/roleTextView"
+        android:layout_toStartOf="@+id/roleTextView"
+        android:onClick="approveSelection" />
 
-                <ProgressBar
-                        android:id="@+id/guessProgress"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_alignRight="@+id/guessProgressText"
-                        android:paddingLeft="10dp"
-                        android:paddingRight="30dp"
-                        android:layout_marginBottom="10dp"
-                        android:progress="30"
-                        android:max="30"
-                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reject"
+        android:id="@+id/rejectSelectionButton"
+        android:layout_alignTop="@+id/approveSelectionButton"
+        android:layout_toRightOf="@+id/roleTextView"
+        android:layout_toEndOf="@+id/roleTextView"
+        android:onClick="rejectSelection" />
 
-                <TextView
-                        android:id="@+id/guessProgressText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:layout_alignTop="@+id/guessProgress"
-                        android:layout_alignBottom="@+id/guessProgress"
-                        android:gravity="center_vertical"
-                        android:text="30"
-                        android:textColor="@android:color/black"/>
+    <Button
+        android:text="Submit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/approveSelectionButton"
+        android:layout_toRightOf="@+id/approveSelectionButton"
+        android:layout_toEndOf="@+id/approveSelectionButton"
+        android:id="@+id/submitSelectionButton"
+        android:onClick="submitSelection" />
 
-                <ListView
-                        android:id="@+id/listView"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_alignParentLeft="true"
-                        android:layout_below="@+id/guessProgress"
-                        android:fadeScrollbars="false"
-                        android:scrollbarAlwaysDrawVerticalTrack="true"
-                        android:textColor="@android:color/black"
-                        android:orientation="vertical">
-                </ListView>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pass"
+        android:id="@+id/passMissionButton"
+        android:layout_above="@+id/approveSelectionButton"
+        android:layout_toLeftOf="@+id/submitSelectionButton"
+        android:layout_toStartOf="@+id/submitSelectionButton"
+        android:onClick="passMission" />
 
-            </RelativeLayout>
-        </RelativeLayout>
-    </LinearLayout>
+    <TextView
+        android:text="Other Information Placeholder Textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/roleTextView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="11dp"
+        android:id="@+id/otherInfoPlaceholderTextView"
+        android:textColor="@android:color/white" />
 
 </RelativeLayout>
