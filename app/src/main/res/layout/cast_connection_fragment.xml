@@ -29,8 +29,10 @@ limitations under the License.
                 android:gravity="center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="yo"
-                android:textColor="@android:color/black"/>
+                android:text="Avalon"
+                android:textSize="70sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"/>
         <ProgressBar
                 android:id="@+id/spinner"
                 style="?android:attr/progressBarStyleLarge"
