@@ -8,6 +8,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 /**
  * A fragment displayed while the player is in the game lobby.
@@ -43,6 +45,7 @@ public class LobbyFragment extends GameFragment {
         mNameEditText = (EditText) view.findViewById(R.id.name);
         mSpinner = (ProgressBar) view.findViewById(R.id.spinner);
         mJoinStartButton = (Button) view.findViewById(R.id.button_join_start);
+
         mJoinStartButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -143,10 +146,11 @@ public class LobbyFragment extends GameFragment {
                 @Override
                 public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
                     if (gameManagerResult.getStatus().isSuccess()) {
-                        ((MainActivity) getActivity())
-                                .setPlayerState(gameManagerClient.getCurrentState().getPlayer(
-                                        gameManagerResult.getPlayerId()).getPlayerState());
-                    } else {
+                        //do nothing?
+                    } else if(gameManagerResult.getStatus().getStatusCode() == GameManagerClient.STATUS_TOO_MANY_PLAYERS){
+                        Toast.makeText(getActivity(), "Please have 5 to 10 players", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
                         mCastConnectionManager.disconnectFromReceiver(false);
                         Utils.showErrorDialog(getActivity(),
                                 gameManagerResult.getStatus().getStatusMessage());
