@@ -58,6 +58,12 @@ public class LobbyFragment extends GameFragment {
         updateView();
     }
 
+    @Override
+    public void onDestroy(){
+        //sendPlayerQuitRequest();
+        super.onDestroy();
+    }
+
     /**
      * Button click handler. Set the new player state based on the current player state.
      */
@@ -68,7 +74,7 @@ public class LobbyFragment extends GameFragment {
             ((MainActivity) getActivity()).setPlayerName(mNameEditText.getText().toString());
             sendPlayerReadyRequest();
         } else if (playerState == GameManagerClient.PLAYER_STATE_READY) {
-            sendPlayerPlayingRequest();
+            sendStartGameRequest();
         }
         updateView();
     }
@@ -80,7 +86,7 @@ public class LobbyFragment extends GameFragment {
         final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
         if (mCastConnectionManager.isConnectedToReceiver()) {
             // Send player name to the receiver
-            JSONObject jsonMessage = new JSONObject();
+            final JSONObject jsonMessage = new JSONObject();
             try {
                 jsonMessage.put("playerName", mNameEditText.getText().toString());
             } catch (JSONException e) {
@@ -93,6 +99,15 @@ public class LobbyFragment extends GameFragment {
                 @Override
                 public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
                     if (gameManagerResult.getStatus().isSuccess()) {
+                        final JSONObject jsonMessage2 = new JSONObject();
+                        try {
+                            jsonMessage2.put("updatePlayerList", true);
+                        } catch (JSONException e){
+                            Log.e(TAG, "Error creating JSON message", e);
+                            return;
+                        }
+                        Log.d(TAG, "sent updatePlayerList signal");
+                        gameManagerClient.sendGameMessage(jsonMessage2);
                         ((MainActivity) getActivity())
                                 .setPlayerState(gameManagerClient.getCurrentState().getPlayer(
                                         gameManagerResult.getPlayerId()).getPlayerState());
@@ -111,11 +126,19 @@ public class LobbyFragment extends GameFragment {
     /**
      * Change the player state to PLAYER_STATE_PLAYING.
      */
-    public void sendPlayerPlayingRequest() {
+    public void sendStartGameRequest() {
         final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
         if (mCastConnectionManager.isConnectedToReceiver()) {
+            // Send player name to the receiver
+            JSONObject jsonMessage = new JSONObject();
+            try {
+                jsonMessage.put("startGame", "true");
+            } catch (JSONException e) {
+                Log.e(TAG, "Error creating JSON message", e);
+                return;
+            }
             PendingResult<GameManagerClient.GameManagerResult> result =
-                    gameManagerClient.sendPlayerPlayingRequest(null);
+                    gameManagerClient.sendGameRequest(jsonMessage);
             result.setResultCallback(new ResultCallback<GameManagerClient.GameManagerResult>() {
                 @Override
                 public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
@@ -133,6 +156,31 @@ public class LobbyFragment extends GameFragment {
             });
         }
         updateView();
+    }
+
+    /**
+     *  Change the player state to PLAYER_STATE_QUIT.
+     */
+    public void sendPlayerQuitRequest() {
+        final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
+        if (mCastConnectionManager.isConnectedToReceiver()) {
+            PendingResult<GameManagerClient.GameManagerResult> result =
+                    gameManagerClient.sendPlayerQuitRequest(null);
+            result.setResultCallback(new ResultCallback<GameManagerClient.GameManagerResult>() {
+                @Override
+                public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
+                    if (gameManagerResult.getStatus().isSuccess()) {
+                        ((MainActivity) getActivity())
+                                .setPlayerState(gameManagerClient.getCurrentState().getPlayer(
+                                        gameManagerResult.getPlayerId()).getPlayerState());
+                    } else {
+                        mCastConnectionManager.disconnectFromReceiver(false);
+                        Utils.showErrorDialog(getActivity(),
+                                gameManagerResult.getStatus().getStatusMessage());
+                    }
+                }
+            });
+        }
     }
 
     /**
