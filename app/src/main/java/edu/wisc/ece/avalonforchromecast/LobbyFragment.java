@@ -8,6 +8,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 /**
  * A fragment displayed while the player is in the game lobby.
@@ -43,6 +45,7 @@ public class LobbyFragment extends GameFragment {
         mNameEditText = (EditText) view.findViewById(R.id.name);
         mSpinner = (ProgressBar) view.findViewById(R.id.spinner);
         mJoinStartButton = (Button) view.findViewById(R.id.button_join_start);
+
         mJoinStartButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -58,6 +61,12 @@ public class LobbyFragment extends GameFragment {
         updateView();
     }
 
+    @Override
+    public void onDestroy(){
+        //sendPlayerQuitRequest();
+        super.onDestroy();
+    }
+
     /**
      * Button click handler. Set the new player state based on the current player state.
      */
@@ -68,7 +77,7 @@ public class LobbyFragment extends GameFragment {
             ((MainActivity) getActivity()).setPlayerName(mNameEditText.getText().toString());
             sendPlayerReadyRequest();
         } else if (playerState == GameManagerClient.PLAYER_STATE_READY) {
-            sendPlayerPlayingRequest();
+            sendStartGameRequest();
         }
         updateView();
     }
@@ -80,7 +89,7 @@ public class LobbyFragment extends GameFragment {
         final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
         if (mCastConnectionManager.isConnectedToReceiver()) {
             // Send player name to the receiver
-            JSONObject jsonMessage = new JSONObject();
+            final JSONObject jsonMessage = new JSONObject();
             try {
                 jsonMessage.put("playerName", mNameEditText.getText().toString());
             } catch (JSONException e) {
@@ -93,6 +102,15 @@ public class LobbyFragment extends GameFragment {
                 @Override
                 public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
                     if (gameManagerResult.getStatus().isSuccess()) {
+                        final JSONObject jsonMessage2 = new JSONObject();
+                        try {
+                            jsonMessage2.put("updatePlayerList", true);
+                        } catch (JSONException e){
+                            Log.e(TAG, "Error creating JSON message", e);
+                            return;
+                        }
+                        Log.d(TAG, "sent updatePlayerList signal");
+                        gameManagerClient.sendGameMessage(jsonMessage2);
                         ((MainActivity) getActivity())
                                 .setPlayerState(gameManagerClient.getCurrentState().getPlayer(
                                         gameManagerResult.getPlayerId()).getPlayerState());
@@ -111,11 +129,47 @@ public class LobbyFragment extends GameFragment {
     /**
      * Change the player state to PLAYER_STATE_PLAYING.
      */
-    public void sendPlayerPlayingRequest() {
+    public void sendStartGameRequest() {
+        final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
+        if (mCastConnectionManager.isConnectedToReceiver()) {
+            // Send player name to the receiver
+            JSONObject jsonMessage = new JSONObject();
+            try {
+                jsonMessage.put("startGame", "true");
+            } catch (JSONException e) {
+                Log.e(TAG, "Error creating JSON message", e);
+                return;
+            }
+            PendingResult<GameManagerClient.GameManagerResult> result =
+                    gameManagerClient.sendGameRequest(jsonMessage);
+            result.setResultCallback(new ResultCallback<GameManagerClient.GameManagerResult>() {
+                @Override
+                public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
+                    if (gameManagerResult.getStatus().isSuccess()) {
+                        //do nothing?
+                    } else if(gameManagerResult.getStatus().getStatusCode() == GameManagerClient.STATUS_TOO_MANY_PLAYERS){
+                        Toast.makeText(getActivity(), "Please have 5 to 10 players", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        mCastConnectionManager.disconnectFromReceiver(false);
+                        Utils.showErrorDialog(getActivity(),
+                                gameManagerResult.getStatus().getStatusMessage());
+                    }
+                    updateView();
+                }
+            });
+        }
+        updateView();
+    }
+
+    /**
+     *  Change the player state to PLAYER_STATE_QUIT.
+     */
+    public void sendPlayerQuitRequest() {
         final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
         if (mCastConnectionManager.isConnectedToReceiver()) {
             PendingResult<GameManagerClient.GameManagerResult> result =
-                    gameManagerClient.sendPlayerPlayingRequest(null);
+                    gameManagerClient.sendPlayerQuitRequest(null);
             result.setResultCallback(new ResultCallback<GameManagerClient.GameManagerResult>() {
                 @Override
                 public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
@@ -128,11 +182,9 @@ public class LobbyFragment extends GameFragment {
                         Utils.showErrorDialog(getActivity(),
                                 gameManagerResult.getStatus().getStatusMessage());
                     }
-                    updateView();
                 }
             });
         }
-        updateView();
     }
 
     /**
