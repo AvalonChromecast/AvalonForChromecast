@@ -23,7 +23,9 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,10 +51,21 @@ public class PlayingFragment extends GameFragment{
     private Button mPassMissionButton;
     private Button mFailMissionButton;
 
+    private ScrollView mPlayerButtonsContainer;
+
+    private static final int SELECTION_PHASE = 0;
+    private static final int VOTING_PHASE = 1;
+    private static final int MISSION_PHASE = 2;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+
+//        GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
+//        GameManagerState gameState = gameManagerClient.getCurrentState();
+//        JSONObject gameData = gameState.getGameData();
+//        selectionPhase(gameState, gameData);
     }
 
     // This be the real onCreate function where we do lots of setup
@@ -67,6 +80,44 @@ public class PlayingFragment extends GameFragment{
         mSubmitSelectionButton = (Button) view.findViewById(R.id.submitSelectionButton);
         mApproveSelectionButton = (Button) view.findViewById(R.id.approveSelectionButton);
         mRejectSelectionButton = (Button) view.findViewById(R.id.rejectSelectionButton);
+        mPassMissionButton = (Button) view.findViewById(R.id.passMissionButton);
+        mFailMissionButton = (Button) view.findViewById(R.id.failMissionButton);
+
+        mPlayerButtonsContainer = (ScrollView) view.findViewById(R.id.playerButtonsContainer);
+
+        mSubmitSelectionButton.setVisibility(View.GONE);
+        mApproveSelectionButton.setVisibility(View.GONE);
+        mRejectSelectionButton.setVisibility(View.GONE);
+        mPassMissionButton.setVisibility(View.GONE);
+        mFailMissionButton.setVisibility(View.GONE);
+
+
+        mSubmitSelectionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onSubmitSelectionClicked();
+            }
+        });
+        mApproveSelectionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {onApproveSelectionClicked();
+            }
+        });
+        mRejectSelectionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {onRejectSelectionClicked();
+            }
+        });
+        mPassMissionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {onPassMissionClicked();
+            }
+        });
+        mFailMissionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {onFailMissionClicked();
+            }
+        });
 
         return view;
     }
@@ -83,9 +134,129 @@ public class PlayingFragment extends GameFragment{
     @Override
     public void onStateChanged(GameManagerState newState,
                                GameManagerState oldState) {
-        if (newState.hasLobbyStateChanged(oldState)) {
-            Log.d(TAG, "onLobbyStateChange: " + newState);
-            mTextViewLobbyState.setText(getLobbyStateName(currentState.getLobbyState()));
+        Log.d(TAG, "Inside onStateChanged");
+        if(newState.hasGameDataChanged(oldState)){
+            if(newState.getGameData() != null){
+                JSONObject gameData = newState.getGameData();
+                Log.d(TAG, "Game data has changed");
+                try {
+                    int gamePhase = gameData.getInt("phase");
+                    if(gamePhase == SELECTION_PHASE){
+                        Log.d(TAG, "Entering selection phase");
+                        selectionPhase(newState, gameData);
+                    }
+                    else if(gamePhase == VOTING_PHASE){
+                        votingPhase(newState, gameData);
+                    }
+                    else if(gamePhase == MISSION_PHASE){
+                        missionPhase(newState, gameData);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
         }
     }
+
+    /**
+     * Handle selection phase.
+     */
+    public void selectionPhase(GameManagerState gameState, JSONObject gameData){
+        try {
+            String leaderId = gameData.getString("leader");
+            String playerId = ((MainActivity) getActivity()).getPlayerId();
+            if(leaderId.equals(playerId)) {
+                //leader view
+                mSubmitSelectionButton.setVisibility(View.VISIBLE);
+
+                //get list of playing players
+                List<PlayerInfo> players = gameState.getPlayersInState(GameManagerClient.PLAYER_STATE_PLAYING);
+                //make radio button for each player
+                for (int i = 0; i < players.size(); i++) {
+                    PlayerInfo player = players.get(i);
+                    String playerName = "";
+                    try {
+                        playerName = player.getPlayerData().getString("name");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        Log.e(TAG, "Unable to access 'name' from PlayerInfo");
+                    }
+                    ToggleButton playerButton = new ToggleButton(getActivity());
+                    playerButton.setText(playerName);
+                    playerButton.setTag(player.getPlayerId());
+                    mPlayerButtonsContainer.addView(playerButton);
+                }
+            }
+            else{
+                //do nothing
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
+
+    /**
+     * Handle voting phase.
+     */
+    public void votingPhase(GameManagerState gameState, JSONObject gameData){
+        mApproveSelectionButton.setVisibility(View.VISIBLE);
+        mRejectSelectionButton.setVisibility(View.VISIBLE);
+
+    }
+
+    /**
+     * Handle mission phase.
+     */
+    public void missionPhase(GameManagerState gameState, JSONObject gameData){
+
+    }
+
+    /**
+     * Button click handler. Submit player selection.
+     */
+    //find out how many buttons in playerButtonsContainer are toggled on
+    //get current missionTeamSize from gameData
+    //if that missionTeamSize equals num playerButtons selected,
+    //create array missionTeam of playerId's of selected playerButtons
+    //sendRequest json 'missionTeam': missionTeam
+    public void onSubmitSelectionClicked(){
+        //TODO: count how many players are selected
+
+
+    }
+
+    /**
+     * Button click handler. Approve team.
+     */
+    public void onApproveSelectionClicked(){
+
+    }
+
+    /**
+     * Button click handler. Reject team.
+     */
+    public void onRejectSelectionClicked(){
+
+    }
+
+    /**
+     * Button click handler. Pass mission.
+     */
+    public void onPassMissionClicked(){
+
+    }
+
+    /**
+     * Button click handler. Fail mission.
+     */
+    public void onFailMissionClicked(){
+
+    }
+
 }

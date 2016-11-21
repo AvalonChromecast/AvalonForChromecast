@@ -214,4 +214,14 @@ public class LobbyFragment extends GameFragment {
         }
     }
 
+    @Override
+    public void onStateChanged(GameManagerState newState, GameManagerState oldState){
+        String playerId = ((MainActivity) getActivity()).getPlayerId();
+        if(newState.hasPlayerStateChanged(playerId, oldState)){
+            ((MainActivity) getActivity()).setPlayerState(newState.getPlayer(
+                    playerId).getPlayerState());
+            ((MainActivity) getActivity()).updateFragments();
+        }
+    }
+
 }

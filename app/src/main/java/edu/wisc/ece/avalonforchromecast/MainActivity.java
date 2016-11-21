@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private PlayingFragment mPlayingFragment;
     private int mPlayerState = GameManagerClient.PLAYER_STATE_UNKNOWN;
     private String mPlayerName;
+    private String mPlayerId;
 
     private CastConnectionManager mCastConnectionManager;
 
@@ -102,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
                     if (gameManagerResult.getStatus().isSuccess()) {
                         Log.d(TAG, "Player ID: " + gameManagerResult.getPlayerId());
+                        mPlayerId = gameManagerResult.getPlayerId();
                         mPlayerState = gameManagerClient.getCurrentState().getPlayer(
                                 gameManagerResult.getPlayerId()).getPlayerState();
                     } else {
@@ -116,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         updateFragments();
     }
 
-    private void updateFragments() {
+    public void updateFragments() {
         if (isChangingConfigurations() || isFinishing() || isDestroyed()) {
             return;
         }
@@ -128,6 +130,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         } else {
             if (mPlayerState == GameManagerClient.PLAYER_STATE_PLAYING) {
                 fragment = mPlayingFragment;
+
             } else {
                 fragment = mLobbyFragment;
             }
@@ -155,6 +158,10 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
     public String getPlayerName() {
         return mPlayerName;
+    }
+
+    public String getPlayerId(){
+        return mPlayerId;
     }
 
     public void setPlayerName(String playerName) {
