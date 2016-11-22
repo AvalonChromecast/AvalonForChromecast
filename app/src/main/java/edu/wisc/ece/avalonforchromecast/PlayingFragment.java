@@ -136,9 +136,10 @@ public class PlayingFragment extends GameFragment{
                                GameManagerState oldState) {
         Log.d(TAG, "Inside onStateChanged");
         if(newState.hasGameDataChanged(oldState)){
+            Log.d(TAG, "hasGameDataChanged");
             if(newState.getGameData() != null){
                 JSONObject gameData = newState.getGameData();
-                Log.d(TAG, "Game data has changed");
+                Log.d(TAG, "getGameData != null");
                 try {
                     int gamePhase = gameData.getInt("phase");
                     if(gamePhase == SELECTION_PHASE){
@@ -155,7 +156,6 @@ public class PlayingFragment extends GameFragment{
                     e.printStackTrace();
                 }
             }
-
         }
     }
 
@@ -163,6 +163,8 @@ public class PlayingFragment extends GameFragment{
      * Handle selection phase.
      */
     public void selectionPhase(GameManagerState gameState, JSONObject gameData){
+        Log.d(TAG, "gameData: " + gameData.toString());
+        //TODO: gameData only contains {"phase":0}
         try {
             String leaderId = gameData.getString("leader");
             String playerId = ((MainActivity) getActivity()).getPlayerId();
@@ -196,10 +198,6 @@ public class PlayingFragment extends GameFragment{
             e.printStackTrace();
         }
     }
-
-
-
-
 
     /**
      * Handle voting phase.

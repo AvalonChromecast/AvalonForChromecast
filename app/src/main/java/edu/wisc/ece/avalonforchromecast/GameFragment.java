@@ -3,10 +3,12 @@ package edu.wisc.ece.avalonforchromecast;
 import com.google.android.gms.cast.games.GameManagerClient;
 import com.google.android.gms.cast.games.GameManagerState;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 
 import java.util.Observable;
 import java.util.Observer;
