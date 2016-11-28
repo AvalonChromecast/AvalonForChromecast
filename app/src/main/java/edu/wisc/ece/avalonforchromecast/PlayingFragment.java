@@ -165,6 +165,25 @@ public class PlayingFragment extends GameFragment{
     }
 
     /**
+     * Called the first time selection phase is called. Initializes info on the screen, such as
+     * loyalty, role, etc.
+     * @param gameState
+     * @param gameData
+     */
+    private void initialize(GameManagerState gameState, JSONObject gameData) {
+        //display loyalty
+        PlayerInfo player = gameState.getPlayer(((MainActivity) getActivity()).getPlayerId());
+        String loyalty = "";
+        try {
+            loyalty = player.getPlayerData().getString("loyalty");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        mPlayerRoleTextView.setText(loyalty);
+        mOtherInfoTextView.setText("");
+    }
+
+    /**
      * Handle selection phase.
      */
     public void selectionPhase(GameManagerState gameState, JSONObject gameData){
@@ -173,6 +192,12 @@ public class PlayingFragment extends GameFragment{
             initialize(gameState, gameData);
             initialized = false;
         }
+
+        mApproveSelectionButton.setVisibility(View.GONE);
+        mRejectSelectionButton.setVisibility(View.GONE);
+        mPassMissionButton.setVisibility(View.GONE);
+        mFailMissionButton.setVisibility(View.GONE);
+
         try {
 
             String leaderId = gameData.getString("leader");
@@ -216,18 +241,7 @@ public class PlayingFragment extends GameFragment{
         }
     }
 
-    private void initialize(GameManagerState gameState, JSONObject gameData) {
-        //display loyalty
-        PlayerInfo player = gameState.getPlayer(((MainActivity) getActivity()).getPlayerId());
-        String loyalty = "";
-        try {
-            loyalty = player.getPlayerData().getString("loyalty");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        mPlayerRoleTextView.setText(loyalty);
-        
-    }
+
 
     /**
      * Handle voting phase.
@@ -243,7 +257,38 @@ public class PlayingFragment extends GameFragment{
     /**
      * Handle mission phase.
      */
-    public void missionPhase(GameManagerState gameState, JSONObject gameData){
+    public void missionPhase(GameManagerState gameState, JSONObject gameData) {
+        //get players in mission team
+        //if you're on the mission team, display pass or fail buttons
+
+        mApproveSelectionButton.setVisibility(View.GONE);
+        mRejectSelectionButton.setVisibility(View.GONE);
+
+
+        try {
+            String playerId = ((MainActivity) getActivity()).getPlayerId();
+
+            JSONArray missionTeam = gameData.getJSONArray("missionTeam");
+            boolean onMission = false;
+            for (int i = 0; i < missionTeam.length(); i++) {
+                if(playerId.equals(missionTeam.getString(i))){
+                    onMission = true;
+                    break;
+                }
+            }
+
+            if (onMission) {
+                Toast.makeText(getActivity(), "You are on the mission", Toast.LENGTH_LONG).show();
+                mPassMissionButton.setVisibility(View.VISIBLE);
+                mFailMissionButton.setVisibility(View.VISIBLE);
+
+            } else {
+                Toast.makeText(getActivity(), "You are not on the mission", Toast.LENGTH_LONG).show();
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
 
     }
 
@@ -308,7 +353,7 @@ public class PlayingFragment extends GameFragment{
             @Override
             public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
                 if (gameManagerResult.getStatus().isSuccess()) {
-
+                    Toast.makeText(getActivity(), "You voted to approve", Toast.LENGTH_SHORT).show();
                 }
                 else {
 
@@ -340,7 +385,7 @@ public class PlayingFragment extends GameFragment{
             @Override
             public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
                 if (gameManagerResult.getStatus().isSuccess()) {
-
+                    Toast.makeText(getActivity(), "You voted to approve", Toast.LENGTH_SHORT).show();
                 }
                 else {
 
@@ -387,6 +432,28 @@ public class PlayingFragment extends GameFragment{
         GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
         GameManagerState state = gameManagerClient.getCurrentState();
         JSONObject gameData = state.getGameData();
+
+        //send a reject message
+        JSONObject jsonMessage = new JSONObject();
+        try {
+            jsonMessage.put("successFail", true);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        PendingResult<GameManagerClient.GameManagerResult> result =
+                gameManagerClient.sendGameRequest(jsonMessage);
+        result.setResultCallback(new ResultCallback<GameManagerClient.GameManagerResult>() {
+            @Override
+            public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
+                if (gameManagerResult.getStatus().isSuccess()) {
+
+                }
+                else {
+
+                }
+            }
+        });
     }
 
     /**
@@ -396,6 +463,28 @@ public class PlayingFragment extends GameFragment{
         GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
         GameManagerState state = gameManagerClient.getCurrentState();
         JSONObject gameData = state.getGameData();
+
+        //send a reject message
+        JSONObject jsonMessage = new JSONObject();
+        try {
+            jsonMessage.put("successFail", false);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        PendingResult<GameManagerClient.GameManagerResult> result =
+                gameManagerClient.sendGameRequest(jsonMessage);
+        result.setResultCallback(new ResultCallback<GameManagerClient.GameManagerResult>() {
+            @Override
+            public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
+                if (gameManagerResult.getStatus().isSuccess()) {
+
+                }
+                else {
+
+                }
+            }
+        });
     }
 
 }
