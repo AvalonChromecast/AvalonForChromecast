@@ -48,6 +48,8 @@ public class PlayingFragment extends GameFragment{
 
     private static final String TAG = "LobbyFragment";
 
+    private boolean initialized;
+
     private TextView mPlayerRoleTextView;
     private TextView mOtherInfoTextView;
     private Button mSubmitSelectionButton;
@@ -79,6 +81,8 @@ public class PlayingFragment extends GameFragment{
             Bundle savedInstanceState) {
         // Inflate the layout for this fragment.
         View view = inflater.inflate(R.layout.playing_fragment, container, false);
+
+        initialized = false;
 
         mPlayerRoleTextView = (TextView) view.findViewById(R.id.roleTextView);
         mOtherInfoTextView = (TextView) view.findViewById(R.id.otherInfoPlaceholderTextView);
@@ -165,6 +169,10 @@ public class PlayingFragment extends GameFragment{
      */
     public void selectionPhase(GameManagerState gameState, JSONObject gameData){
         Log.d(TAG, "gameData: " + gameData.toString());
+        if(!initialized){
+            initialize(gameState, gameData);
+            initialized = false;
+        }
         try {
 
             String leaderId = gameData.getString("leader");
@@ -206,6 +214,19 @@ public class PlayingFragment extends GameFragment{
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    private void initialize(GameManagerState gameState, JSONObject gameData) {
+        //display loyalty
+        PlayerInfo player = gameState.getPlayer(((MainActivity) getActivity()).getPlayerId());
+        String loyalty = "";
+        try {
+            loyalty = player.getPlayerData().getString("loyalty");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        mPlayerRoleTextView.setText(loyalty);
+        
     }
 
     /**
@@ -304,6 +325,28 @@ public class PlayingFragment extends GameFragment{
         GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
         GameManagerState state = gameManagerClient.getCurrentState();
         JSONObject gameData = state.getGameData();
+
+        //send an approve message
+        JSONObject jsonMessage = new JSONObject();
+        try {
+            jsonMessage.put("acceptReject", true);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        PendingResult<GameManagerClient.GameManagerResult> result =
+                gameManagerClient.sendGameRequest(jsonMessage);
+        result.setResultCallback(new ResultCallback<GameManagerClient.GameManagerResult>() {
+            @Override
+            public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
+                if (gameManagerResult.getStatus().isSuccess()) {
+
+                }
+                else {
+
+                }
+            }
+        });
     }
 
     /**
@@ -313,6 +356,28 @@ public class PlayingFragment extends GameFragment{
         GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
         GameManagerState state = gameManagerClient.getCurrentState();
         JSONObject gameData = state.getGameData();
+
+        //send a reject message
+        JSONObject jsonMessage = new JSONObject();
+        try {
+            jsonMessage.put("acceptReject", false);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        PendingResult<GameManagerClient.GameManagerResult> result =
+                gameManagerClient.sendGameRequest(jsonMessage);
+        result.setResultCallback(new ResultCallback<GameManagerClient.GameManagerResult>() {
+            @Override
+            public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
+                if (gameManagerResult.getStatus().isSuccess()) {
+
+                }
+                else {
+
+                }
+            }
+        });
     }
 
     /**
