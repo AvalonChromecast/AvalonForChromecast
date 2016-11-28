@@ -284,7 +284,10 @@ public class PlayingFragment extends GameFragment{
             if (onMission) {
                 Toast.makeText(getActivity(), "You are on the mission", Toast.LENGTH_LONG).show();
                 mPassMissionButton.setVisibility(View.VISIBLE);
-                mFailMissionButton.setVisibility(View.VISIBLE);
+                PlayerInfo player = gameState.getPlayer(((MainActivity) getActivity()).getPlayerId());
+                String loyalty = player.getPlayerData().getString("loyalty");
+                if(loyalty.equals("evil"))
+                    mFailMissionButton.setVisibility(View.VISIBLE);
 
             } else {
                 Toast.makeText(getActivity(), "You are not on the mission", Toast.LENGTH_LONG).show();
@@ -357,7 +360,7 @@ public class PlayingFragment extends GameFragment{
             @Override
             public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
                 if (gameManagerResult.getStatus().isSuccess()) {
-                    Toast.makeText(getActivity(), "You voted to approve", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "You submitted a selection", Toast.LENGTH_SHORT).show();
                 }
                 else {
 
