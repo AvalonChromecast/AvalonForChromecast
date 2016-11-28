@@ -205,6 +205,7 @@ public class PlayingFragment extends GameFragment{
         try {
 
             String leaderId = gameData.getString("leader");
+            Log.d(TAG, "Leader id: " + leaderId);
             String playerId = ((MainActivity) getActivity()).getPlayerId();
             if(leaderId.equals(playerId)) {
                 Toast.makeText(getActivity(), "You are the leader", Toast.LENGTH_LONG).show();
@@ -264,16 +265,14 @@ public class PlayingFragment extends GameFragment{
     public void missionPhase(GameManagerState gameState, JSONObject gameData) {
         //get players in mission team
         //if you're on the mission team, display pass or fail buttons
-
         mApproveSelectionButton.setVisibility(View.GONE);
         mRejectSelectionButton.setVisibility(View.GONE);
-
-
         try {
             String playerId = ((MainActivity) getActivity()).getPlayerId();
 
             JSONArray missionTeam = gameData.getJSONArray("missionTeam");
             boolean onMission = false;
+            Log.d(TAG, "missionTeam: " + missionTeam.toString());
             for (int i = 0; i < missionTeam.length(); i++) {
                 if(playerId.equals(missionTeam.getString(i))){
                     onMission = true;
