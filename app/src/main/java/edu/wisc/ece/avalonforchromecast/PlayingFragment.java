@@ -284,7 +284,7 @@ public class PlayingFragment extends GameFragment{
             e.printStackTrace();
         }
 
-        //TODO: sending message
+        //sending missionTeam array
         PendingResult<GameManagerClient.GameManagerResult> result =
                 gameManagerClient.sendGameRequest(missionTeam);
         result.setResultCallback(new ResultCallback<GameManagerClient.GameManagerResult>() {
