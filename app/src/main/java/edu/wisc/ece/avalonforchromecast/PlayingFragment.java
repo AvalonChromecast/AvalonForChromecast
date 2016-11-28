@@ -6,6 +6,7 @@ import com.google.android.gms.cast.games.PlayerInfo;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -247,35 +248,30 @@ public class PlayingFragment extends GameFragment{
         }
 
         //count how many players are selected
-        String[] selectedPlayers = new String[teamSize];
-
-        Log.d(TAG, "selectedPlayers size: " + selectedPlayers.length);
+        ArrayList<String> selectedPlayers = new ArrayList<>();
 
         ArrayList<View> playerButtons;
         playerButtons = mPlayerButtonsContainer.getTouchables();
 
-        int numSelected = 0;
         for(int i=0; i<playerButtons.size(); i++){
             ToggleButton currPlayer = (ToggleButton) playerButtons.get(i);
             if(currPlayer.isChecked()){
-
-                if(numSelected >= teamSize){
-                    Toast.makeText(getActivity(), "You selected too many players", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                selectedPlayers[numSelected] = ((String)currPlayer.getTag());
-                numSelected++;
+                selectedPlayers.add(((String)currPlayer.getTag()));
             }
         }
 
-        if(numSelected != teamSize){
+        if(selectedPlayers.size() < teamSize){
             Toast.makeText(getActivity(), "You selected too few players", Toast.LENGTH_SHORT).show();
+            return;
+        } else if(selectedPlayers.size() > teamSize){
+            Toast.makeText(getActivity(), "You selected too many players", Toast.LENGTH_SHORT).show();
             return;
         }
 
+
         JSONObject missionTeam = new JSONObject();
         try {
-            missionTeam.put("missionTeam", selectedPlayers);
+            missionTeam.put("missionTeam", new JSONArray(selectedPlayers));
             for(String player: selectedPlayers){
                 Log.d(TAG, "selectedPlayers: " + player );
             }
