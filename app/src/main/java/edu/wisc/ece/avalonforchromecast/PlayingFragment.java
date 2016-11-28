@@ -143,11 +143,15 @@ public class PlayingFragment extends GameFragment{
     @Override
     public void onStateChanged(GameManagerState newState,
                                GameManagerState oldState) {
+        Log.d(TAG, "In onStateChanged");
         if(newState.hasGameDataChanged(oldState)){
+            Log.d(TAG, "GameData has changed");
             if(newState.getGameData() != null){
+                Log.d(TAG, "GameData is not null");
                 JSONObject gameData = newState.getGameData();
                 try {
                     int gamePhase = gameData.getInt("phase");
+                    Log.d(TAG, "game phase:" + gamePhase);
                     if(gamePhase == SELECTION_PHASE){
                         selectionPhase(newState, gameData);
                     }
