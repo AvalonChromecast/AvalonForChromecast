@@ -26,56 +26,6 @@
         android:textStyle="bold"
         />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Fail"
-        android:id="@+id/failMissionButton"
-        android:layout_alignTop="@+id/passMissionButton"
-        android:layout_alignLeft="@+id/rejectSelectionButton"
-        android:layout_alignStart="@+id/rejectSelectionButton"
-        android:onClick="failMission" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Approve"
-        android:id="@+id/approveSelectionButton"
-        android:layout_alignParentBottom="true"
-        android:layout_toLeftOf="@+id/roleTextView"
-        android:layout_toStartOf="@+id/roleTextView"
-        android:onClick="approveSelection" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Reject"
-        android:id="@+id/rejectSelectionButton"
-        android:layout_alignTop="@+id/approveSelectionButton"
-        android:layout_toRightOf="@+id/roleTextView"
-        android:layout_toEndOf="@+id/roleTextView"
-        android:onClick="rejectSelection" />
-
-    <Button
-        android:text="Submit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/approveSelectionButton"
-        android:layout_toRightOf="@+id/approveSelectionButton"
-        android:layout_toEndOf="@+id/approveSelectionButton"
-        android:id="@+id/submitSelectionButton"
-        android:onClick="submitSelection" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Pass"
-        android:id="@+id/passMissionButton"
-        android:layout_above="@+id/approveSelectionButton"
-        android:layout_toLeftOf="@+id/submitSelectionButton"
-        android:layout_toStartOf="@+id/submitSelectionButton"
-        android:onClick="passMission" />
-
     <TextView
         android:text="Other Information Placeholder Textview"
         android:layout_width="wrap_content"
@@ -86,12 +36,55 @@
         android:id="@+id/otherInfoPlaceholderTextView"
         android:textColor="@android:color/white" />
 
+    <Button
+        android:text="Submit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/submitSelectionButton"
+        android:onClick="submitSelection"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Approve"
+        android:id="@+id/approveSelectionButton"
+        android:onClick="approveSelection"
+        android:layout_alignParentBottom="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reject"
+        android:id="@+id/rejectSelectionButton"
+        android:onClick="rejectSelection"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pass"
+        android:id="@+id/passMissionButton"
+        android:onClick="passMission"
+        android:layout_alignParentBottom="true"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Fail"
+        android:id="@+id/failMissionButton"
+        android:onClick="failMission"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true" />
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_centerHorizontal="true"
-        android:layout_above="@+id/failMissionButton"
-        android:layout_below="@+id/otherInfoPlaceholderTextView">
+        android:layout_below="@+id/otherInfoPlaceholderTextView"
+        android:layout_marginTop="20dp"
+        android:layout_above="@+id/submitSelectionButton">
 
         <LinearLayout
             android:id="@+id/playerButtonsContainer"

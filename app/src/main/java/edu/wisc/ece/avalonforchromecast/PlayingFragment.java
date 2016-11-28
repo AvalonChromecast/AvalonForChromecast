@@ -207,6 +207,7 @@ public class PlayingFragment extends GameFragment{
             String leaderId = gameData.getString("leader");
             Log.d(TAG, "Leader id: " + leaderId);
             String playerId = ((MainActivity) getActivity()).getPlayerId();
+            Log.d(TAG, "Player id: " + playerId);
             if(leaderId.equals(playerId)) {
                 Toast.makeText(getActivity(), "You are the leader", Toast.LENGTH_LONG).show();
                 //leader view
