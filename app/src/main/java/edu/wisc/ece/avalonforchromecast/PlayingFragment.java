@@ -3,6 +3,8 @@ package edu.wisc.ece.avalonforchromecast;
 import com.google.android.gms.cast.games.GameManagerClient;
 import com.google.android.gms.cast.games.GameManagerState;
 import com.google.android.gms.cast.games.PlayerInfo;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,10 +23,12 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import java.util.ArrayList;
@@ -51,7 +55,7 @@ public class PlayingFragment extends GameFragment{
     private Button mPassMissionButton;
     private Button mFailMissionButton;
 
-    private ScrollView mPlayerButtonsContainer;
+    private LinearLayout mPlayerButtonsContainer;
 
     private static final int SELECTION_PHASE = 0;
     private static final int VOTING_PHASE = 1;
@@ -83,7 +87,7 @@ public class PlayingFragment extends GameFragment{
         mPassMissionButton = (Button) view.findViewById(R.id.passMissionButton);
         mFailMissionButton = (Button) view.findViewById(R.id.failMissionButton);
 
-        mPlayerButtonsContainer = (ScrollView) view.findViewById(R.id.playerButtonsContainer);
+        mPlayerButtonsContainer = (LinearLayout) view.findViewById(R.id.playerButtonsContainer);
 
         mSubmitSelectionButton.setVisibility(View.GONE);
         mApproveSelectionButton.setVisibility(View.GONE);
@@ -134,16 +138,12 @@ public class PlayingFragment extends GameFragment{
     @Override
     public void onStateChanged(GameManagerState newState,
                                GameManagerState oldState) {
-        Log.d(TAG, "Inside onStateChanged");
         if(newState.hasGameDataChanged(oldState)){
-            Log.d(TAG, "hasGameDataChanged");
             if(newState.getGameData() != null){
                 JSONObject gameData = newState.getGameData();
-                Log.d(TAG, "getGameData != null");
                 try {
                     int gamePhase = gameData.getInt("phase");
                     if(gamePhase == SELECTION_PHASE){
-                        Log.d(TAG, "Entering selection phase");
                         selectionPhase(newState, gameData);
                     }
                     else if(gamePhase == VOTING_PHASE){
@@ -164,12 +164,16 @@ public class PlayingFragment extends GameFragment{
      */
     public void selectionPhase(GameManagerState gameState, JSONObject gameData){
         Log.d(TAG, "gameData: " + gameData.toString());
-        //TODO: gameData only contains {"phase":0}
         try {
+
             String leaderId = gameData.getString("leader");
             String playerId = ((MainActivity) getActivity()).getPlayerId();
             if(leaderId.equals(playerId)) {
+                Toast.makeText(getActivity(), "You are the leader", Toast.LENGTH_LONG).show();
                 //leader view
+                //remove extra buttons when entering this phase again
+                mPlayerButtonsContainer.removeAllViews();
+                mPlayerButtonsContainer.setVisibility(View.VISIBLE);
                 mSubmitSelectionButton.setVisibility(View.VISIBLE);
 
                 //get list of playing players
@@ -177,6 +181,7 @@ public class PlayingFragment extends GameFragment{
                 //make radio button for each player
                 for (int i = 0; i < players.size(); i++) {
                     PlayerInfo player = players.get(i);
+                    Log.d(TAG, "playerData: " + player.getPlayerData().toString());
                     String playerName = "";
                     try {
                         playerName = player.getPlayerData().getString("name");
@@ -186,12 +191,15 @@ public class PlayingFragment extends GameFragment{
                     }
                     ToggleButton playerButton = new ToggleButton(getActivity());
                     playerButton.setText(playerName);
+                    playerButton.setTextOn(playerName);
+                    playerButton.setTextOff(playerName);
                     playerButton.setTag(player.getPlayerId());
                     mPlayerButtonsContainer.addView(playerButton);
                 }
             }
             else{
                 //do nothing
+                Toast.makeText(getActivity(), "You are not the leader", Toast.LENGTH_LONG).show();
             }
 
         } catch (JSONException e) {
@@ -205,6 +213,8 @@ public class PlayingFragment extends GameFragment{
     public void votingPhase(GameManagerState gameState, JSONObject gameData){
         mApproveSelectionButton.setVisibility(View.VISIBLE);
         mRejectSelectionButton.setVisibility(View.VISIBLE);
+        mSubmitSelectionButton.setVisibility(View.GONE);
+        mPlayerButtonsContainer.setVisibility(View.GONE);
 
     }
 
@@ -224,8 +234,70 @@ public class PlayingFragment extends GameFragment{
     //create array missionTeam of playerId's of selected playerButtons
     //sendRequest json 'missionTeam': missionTeam
     public void onSubmitSelectionClicked(){
-        //TODO: count how many players are selected
+        //get number of players can be selected
+        GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
+        GameManagerState state = gameManagerClient.getCurrentState();
+        JSONObject gameData = state.getGameData();
 
+        int teamSize = 0;
+        try {
+            teamSize = gameData.getInt("missionTeamSize");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        //count how many players are selected
+        String[] selectedPlayers = new String[teamSize];
+
+        Log.d(TAG, "selectedPlayers size: " + selectedPlayers.length);
+
+        ArrayList<View> playerButtons;
+        playerButtons = mPlayerButtonsContainer.getTouchables();
+
+        int numSelected = 0;
+        for(int i=0; i<playerButtons.size(); i++){
+            ToggleButton currPlayer = (ToggleButton) playerButtons.get(i);
+            if(currPlayer.isChecked()){
+
+                if(numSelected >= teamSize){
+                    Toast.makeText(getActivity(), "You selected too many players", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                selectedPlayers[numSelected] = ((String)currPlayer.getTag());
+                numSelected++;
+            }
+        }
+
+        if(numSelected != teamSize){
+            Toast.makeText(getActivity(), "You selected too few players", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        JSONObject missionTeam = new JSONObject();
+        try {
+            missionTeam.put("missionTeam", selectedPlayers);
+            for(String player: selectedPlayers){
+                Log.d(TAG, "selectedPlayers: " + player );
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        //TODO: sending message
+        PendingResult<GameManagerClient.GameManagerResult> result =
+                gameManagerClient.sendGameRequest(missionTeam);
+        result.setResultCallback(new ResultCallback<GameManagerClient.GameManagerResult>() {
+            @Override
+            public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
+                if (gameManagerResult.getStatus().isSuccess()) {
+
+                }
+                else {
+
+                }
+            }
+        });
 
     }
 
@@ -233,28 +305,36 @@ public class PlayingFragment extends GameFragment{
      * Button click handler. Approve team.
      */
     public void onApproveSelectionClicked(){
-
+        GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
+        GameManagerState state = gameManagerClient.getCurrentState();
+        JSONObject gameData = state.getGameData();
     }
 
     /**
      * Button click handler. Reject team.
      */
     public void onRejectSelectionClicked(){
-
+        GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
+        GameManagerState state = gameManagerClient.getCurrentState();
+        JSONObject gameData = state.getGameData();
     }
 
     /**
      * Button click handler. Pass mission.
      */
     public void onPassMissionClicked(){
-
+        GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
+        GameManagerState state = gameManagerClient.getCurrentState();
+        JSONObject gameData = state.getGameData();
     }
 
     /**
      * Button click handler. Fail mission.
      */
     public void onFailMissionClicked(){
-
+        GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
+        GameManagerState state = gameManagerClient.getCurrentState();
+        JSONObject gameData = state.getGameData();
     }
 
 }
