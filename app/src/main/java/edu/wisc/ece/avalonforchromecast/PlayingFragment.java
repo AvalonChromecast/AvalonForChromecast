@@ -134,11 +134,13 @@ public class PlayingFragment extends GameFragment{
     @Override
     public void onStart() {
         super.onStart();
+        if(!initialized){
+            GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
+            GameManagerState state = gameManagerClient.getCurrentState();
+            JSONObject gameData = state.getGameData();
+            selectionPhase(state, gameData);
+        }
 
-        GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
-        GameManagerState state = gameManagerClient.getCurrentState();
-        JSONObject gameData = state.getGameData();
-        selectionPhase(state, gameData);
 
     }
 
@@ -399,6 +401,8 @@ public class PlayingFragment extends GameFragment{
             public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
                 if (gameManagerResult.getStatus().isSuccess()) {
                     Toast.makeText(getActivity(), "You voted to approve", Toast.LENGTH_SHORT).show();
+                    mApproveSelectionButton.setVisibility(View.GONE);
+                    mRejectSelectionButton.setVisibility(View.GONE);
                 }
                 else {
 
@@ -429,7 +433,9 @@ public class PlayingFragment extends GameFragment{
             @Override
             public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
                 if (gameManagerResult.getStatus().isSuccess()) {
-
+                    Toast.makeText(getActivity(), "You voted to reject", Toast.LENGTH_SHORT).show();
+                    mApproveSelectionButton.setVisibility(View.GONE);
+                    mRejectSelectionButton.setVisibility(View.GONE);
                 }
                 else {
 
@@ -460,7 +466,9 @@ public class PlayingFragment extends GameFragment{
             @Override
             public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
                 if (gameManagerResult.getStatus().isSuccess()) {
-
+                    Toast.makeText(getActivity(), "You passed the mission", Toast.LENGTH_SHORT).show();
+                    mPassMissionButton.setVisibility(View.GONE);
+                    mFailMissionButton.setVisibility(View.GONE);
                 }
                 else {
 
@@ -491,7 +499,9 @@ public class PlayingFragment extends GameFragment{
             @Override
             public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
                 if (gameManagerResult.getStatus().isSuccess()) {
-
+                    Toast.makeText(getActivity(), "You failed the mission", Toast.LENGTH_SHORT).show();
+                    mPassMissionButton.setVisibility(View.GONE);
+                    mFailMissionButton.setVisibility(View.GONE);
                 }
                 else {
 
