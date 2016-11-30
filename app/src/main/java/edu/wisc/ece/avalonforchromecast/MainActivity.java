@@ -161,6 +161,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     }
 
     public void setPlayerState(int state) {
+        Log.d(TAG, "setting player state: " + state);
         mPlayerState = state;
         updateFragments();
     }

@@ -146,7 +146,7 @@ public class LobbyFragment extends GameFragment {
                 @Override
                 public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
                     if (gameManagerResult.getStatus().isSuccess()) {
-                        //do nothing?
+                        Toast.makeText(getActivity(), "Start Game was successful", Toast.LENGTH_SHORT);
                         ((MainActivity) getActivity())
                                 .setPlayerState(gameManagerClient.getCurrentState().getPlayer(
                                         gameManagerResult.getPlayerId()).getPlayerState());
