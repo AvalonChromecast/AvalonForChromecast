@@ -11,10 +11,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Vibrator;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -51,7 +53,7 @@ public class PlayingFragment extends GameFragment{
     private boolean initialized;
 
     private TextView mPlayerRoleTextView;
-    private TextView mOtherInfoTextView;
+    private TextView mMissionTeamSizeView;
     private Button mSubmitSelectionButton;
     private Button mApproveSelectionButton;
     private Button mRejectSelectionButton;
@@ -85,7 +87,7 @@ public class PlayingFragment extends GameFragment{
         initialized = false;
 
         mPlayerRoleTextView = (TextView) view.findViewById(R.id.roleTextView);
-        mOtherInfoTextView = (TextView) view.findViewById(R.id.otherInfoPlaceholderTextView);
+        mMissionTeamSizeView = (TextView) view.findViewById(R.id.missionTeamSizeView);
         mSubmitSelectionButton = (Button) view.findViewById(R.id.submitSelectionButton);
         mApproveSelectionButton = (Button) view.findViewById(R.id.approveSelectionButton);
         mRejectSelectionButton = (Button) view.findViewById(R.id.rejectSelectionButton);
@@ -134,13 +136,26 @@ public class PlayingFragment extends GameFragment{
     @Override
     public void onStart() {
         super.onStart();
-        if(!initialized){
-            GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
-            GameManagerState state = gameManagerClient.getCurrentState();
-            JSONObject gameData = state.getGameData();
-            selectionPhase(state, gameData);
-        }
 
+        GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
+        GameManagerState state = gameManagerClient.getCurrentState();
+        JSONObject gameData = state.getGameData();
+
+        try {
+            int gamePhase = gameData.getInt("phase");
+            Log.d(TAG, "game phase:" + gamePhase);
+            if(gamePhase == SELECTION_PHASE){
+                selectionPhase(state, gameData);
+            }
+            else if(gamePhase == VOTING_PHASE){
+                votingPhase(state, gameData);
+            }
+            else if(gamePhase == MISSION_PHASE){
+                missionPhase(state, gameData);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -192,13 +207,14 @@ public class PlayingFragment extends GameFragment{
             e.printStackTrace();
         }
         mPlayerRoleTextView.setText(loyalty);
-        mOtherInfoTextView.setText("");
+        mMissionTeamSizeView.setText("");
     }
 
     /**
      * Handle selection phase.
      */
     public void selectionPhase(GameManagerState gameState, JSONObject gameData){
+
         Log.d(TAG, "gameData: " + gameData.toString());
         if(!initialized){
             initialize(gameState, gameData);
@@ -217,9 +233,14 @@ public class PlayingFragment extends GameFragment{
             String playerId = ((MainActivity) getActivity()).getPlayerId();
             Log.d(TAG, "Player id: " + playerId);
             if(leaderId.equals(playerId)) {
+                Vibrator v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+                // Vibrate for 250 milliseconds
+                v.vibrate(250);
+
                 Toast.makeText(getActivity(), "You are the leader", Toast.LENGTH_LONG).show();
                 //leader view
                 //remove extra buttons when entering this phase again
+                mMissionTeamSizeView.setVisibility(View.VISIBLE);
                 mPlayerButtonsContainer.removeAllViews();
                 mPlayerButtonsContainer.setVisibility(View.VISIBLE);
                 mSubmitSelectionButton.setVisibility(View.VISIBLE);
@@ -244,6 +265,7 @@ public class PlayingFragment extends GameFragment{
                     playerButton.setTag(player.getPlayerId());
                     mPlayerButtonsContainer.addView(playerButton);
                 }
+                mMissionTeamSizeView.setText("Select " + players.size() + " people for the mission");
             }
             else{
                 //do nothing
@@ -261,17 +283,23 @@ public class PlayingFragment extends GameFragment{
      * Handle voting phase.
      */
     public void votingPhase(GameManagerState gameState, JSONObject gameData){
+        mMissionTeamSizeView.setVisibility(View.GONE);
+
+        Vibrator v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+        // Vibrate for 250 milliseconds
+        v.vibrate(250);
+
         mApproveSelectionButton.setVisibility(View.VISIBLE);
         mRejectSelectionButton.setVisibility(View.VISIBLE);
         mSubmitSelectionButton.setVisibility(View.GONE);
         mPlayerButtonsContainer.setVisibility(View.GONE);
-
     }
 
     /**
      * Handle mission phase.
      */
     public void missionPhase(GameManagerState gameState, JSONObject gameData) {
+
         //get players in mission team
         //if you're on the mission team, display pass or fail buttons
         mApproveSelectionButton.setVisibility(View.GONE);
@@ -290,6 +318,10 @@ public class PlayingFragment extends GameFragment{
             }
 
             if (onMission) {
+                Vibrator v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+                // Vibrate for 250 milliseconds
+                v.vibrate(250);
+
                 Toast.makeText(getActivity(), "You are on the mission", Toast.LENGTH_LONG).show();
                 mPassMissionButton.setVisibility(View.VISIBLE);
                 PlayerInfo player = gameState.getPlayer(((MainActivity) getActivity()).getPlayerId());
