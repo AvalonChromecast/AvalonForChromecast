@@ -102,6 +102,8 @@ public class PlayingFragment extends GameFragment{
         mPassMissionButton.setVisibility(View.GONE);
         mFailMissionButton.setVisibility(View.GONE);
 
+        mMissionTeamSizeView.setVisibility(View.GONE);
+
 
         mSubmitSelectionButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -153,6 +155,7 @@ public class PlayingFragment extends GameFragment{
             else if(gamePhase == MISSION_PHASE){
                 missionPhase(state, gameData);
             }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -166,11 +169,8 @@ public class PlayingFragment extends GameFragment{
     @Override
     public void onStateChanged(GameManagerState newState,
                                GameManagerState oldState) {
-        Log.d(TAG, "In onStateChanged");
         if(newState.hasGameDataChanged(oldState)){
-            Log.d(TAG, "GameData has changed");
             if(newState.getGameData() != null){
-                Log.d(TAG, "GameData is not null");
                 JSONObject gameData = newState.getGameData();
                 try {
                     int gamePhase = gameData.getInt("phase");
@@ -187,6 +187,7 @@ public class PlayingFragment extends GameFragment{
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                ((MainActivity) getActivity()).updateFragments();
             }
         }
     }
@@ -206,6 +207,9 @@ public class PlayingFragment extends GameFragment{
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        ((MainActivity) getActivity()).setLoyalty(loyalty);
+
         mPlayerRoleTextView.setText(loyalty);
         mMissionTeamSizeView.setText("");
     }

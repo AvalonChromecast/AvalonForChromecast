@@ -1,6 +1,7 @@
 package edu.wisc.ece.avalonforchromecast;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,10 @@ public class CastConnectionFragment extends GameFragment {
         View view = inflater.inflate(R.layout.cast_connection_fragment, container, false);
         mConnectLabel = view.findViewById(R.id.connect_label);
         mSpinner = view.findViewById(R.id.spinner);
+
+        Log.d(TAG, "Avalon should be visible");
+        mConnectLabel.setVisibility(View.VISIBLE);
+
         return view;
     }
 

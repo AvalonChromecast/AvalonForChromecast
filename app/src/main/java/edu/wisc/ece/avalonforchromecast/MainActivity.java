@@ -1,6 +1,7 @@
 package edu.wisc.ece.avalonforchromecast;
 
 import com.google.android.gms.cast.games.GameManagerClient;
+import com.google.android.gms.cast.games.GameManagerState;
 import com.google.android.gms.cast.games.PlayerInfo;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
@@ -20,6 +21,7 @@ import android.widget.ScrollView;
 import android.widget.ToggleButton;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Observable;
@@ -35,12 +37,15 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private CastConnectionFragment mCastConnectionFragment;
     private LobbyFragment mLobbyFragment;
     private PlayingFragment mPlayingFragment;
+    private GameOverFragment mGameOverFragment;
     private int mPlayerState = GameManagerClient.PLAYER_STATE_UNKNOWN;
     private String mPlayerName;
     private String mPlayerId;
+    private String mLoyalty;
 
     private CastConnectionManager mCastConnectionManager;
 
+    private static final int GAMEOVER_PHASE = 3;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -57,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         mCastConnectionFragment = new CastConnectionFragment();
         mPlayingFragment = new PlayingFragment();
         mLobbyFragment = new LobbyFragment();
+        mGameOverFragment = new GameOverFragment();
 
         updateFragments();
     }
@@ -132,15 +138,39 @@ public class MainActivity extends AppCompatActivity implements Observer {
             return;
         }
 
+
         Fragment fragment;
         if (!mCastConnectionManager.isConnectedToReceiver()) {
             mPlayerName = null;
             fragment = mCastConnectionFragment;
         } else {
-            if (mPlayerState == GameManagerClient.PLAYER_STATE_PLAYING) {
-                fragment = mPlayingFragment;
+            GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
+            if(gameManagerClient == null){
+                return;
+            }
+            GameManagerState state = gameManagerClient.getCurrentState();
+            JSONObject gameData = state.getGameData();
 
-            } else {
+            int gamePhase = -1;
+
+            try {
+                gamePhase = gameData.getInt("phase");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            Log.d(TAG, "gamePhase is " + gamePhase);
+
+            if (mPlayerState == GameManagerClient.PLAYER_STATE_PLAYING) {
+                if(gamePhase == GAMEOVER_PHASE){
+                    fragment = mGameOverFragment;
+                }
+                else{
+                    fragment = mPlayingFragment;
+                }
+            }
+            //this happens when player state is ready or game phase is -1
+            else {
                 fragment = mLobbyFragment;
             }
         }
@@ -176,5 +206,12 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
     public void setPlayerName(String playerName) {
         mPlayerName = playerName;
+    }
+
+    public void setLoyalty(String loyalty){
+        mLoyalty = loyalty;
+    }
+    public String getLoyalty(){
+        return mLoyalty;
     }
 }

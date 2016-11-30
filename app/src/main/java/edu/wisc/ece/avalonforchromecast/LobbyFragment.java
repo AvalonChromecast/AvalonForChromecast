@@ -71,11 +71,19 @@ public class LobbyFragment extends GameFragment {
      * Button click handler. Set the new player state based on the current player state.
      */
     private void onJoinStartClicked() {
+        GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
+        GameManagerState state = gameManagerClient.getCurrentState();
+
         int playerState = ((MainActivity) getActivity()).getPlayerState();
-        if (playerState == GameManagerClient.PLAYER_STATE_AVAILABLE
-                || playerState == GameManagerClient.PLAYER_STATE_PLAYING) {
-            ((MainActivity) getActivity()).setPlayerName(mNameEditText.getText().toString());
-            sendPlayerReadyRequest();
+        if (playerState == GameManagerClient.PLAYER_STATE_AVAILABLE) {
+            //if lobby state is closed
+            if(state.getLobbyState() == GameManagerClient.LOBBY_STATE_CLOSED){
+                Toast.makeText(getActivity(), "Please wait until the game is finished", Toast.LENGTH_SHORT).show();
+            }
+            else{
+                ((MainActivity) getActivity()).setPlayerName(mNameEditText.getText().toString());
+                sendPlayerReadyRequest();
+            }
         } else if (playerState == GameManagerClient.PLAYER_STATE_READY) {
             sendStartGameRequest();
         }

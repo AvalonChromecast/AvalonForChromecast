@@ -41,4 +41,5 @@ limitations under the License.
                 android:visibility="gone">
         </ProgressBar>
     </FrameLayout>
+
 </FrameLayout>
