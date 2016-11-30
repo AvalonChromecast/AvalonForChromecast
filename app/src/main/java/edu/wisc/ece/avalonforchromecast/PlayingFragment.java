@@ -134,6 +134,12 @@ public class PlayingFragment extends GameFragment{
     @Override
     public void onStart() {
         super.onStart();
+
+        GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
+        GameManagerState state = gameManagerClient.getCurrentState();
+        JSONObject gameData = state.getGameData();
+        selectionPhase(state, gameData);
+
     }
 
 
