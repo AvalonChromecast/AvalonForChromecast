@@ -65,8 +65,50 @@ public class GameOverFragment extends GameFragment{
         View view = inflater.inflate(R.layout.playing_fragment, container, false);
 
         mGameOverView = (TextView) view.findViewById(R.id.gameOverView);
+//
+//        GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
+//        if(gameManagerClient == null){
+//            Log.d(TAG, "gamemanagerClient is somehow null.");
+//            return view;
+//        }
+//        GameManagerState state = gameManagerClient.getCurrentState();
+//        JSONObject gameData = state.getGameData();
+//
+//        boolean goodWins = false;
+//        try {
+//            goodWins = gameData.getBoolean("goodWins");
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//
+//        String loyalty = ((MainActivity) getActivity()).getLoyalty();
+//        boolean isGood = false;
+//        if(loyalty.equals("good")){
+//            isGood = true;
+//        }
+//        else if(loyalty.equals("evil")){
+//            isGood = false;
+//        }
+//
+//        if(goodWins == isGood){
+//            mGameOverView.setText("You are on the winning team");
+//        }
+//        else{
+//            mGameOverView.setText("You are on the losing team");
+//        }
+
+        return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
 
         GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
+        if(gameManagerClient == null){
+            Log.d(TAG, "gamemanagerClient is somehow null.");
+            return;
+        }
         GameManagerState state = gameManagerClient.getCurrentState();
         JSONObject gameData = state.getGameData();
 
@@ -92,13 +134,6 @@ public class GameOverFragment extends GameFragment{
         else{
             mGameOverView.setText("You are on the losing team");
         }
-
-        return view;
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
     }
 
     /**
