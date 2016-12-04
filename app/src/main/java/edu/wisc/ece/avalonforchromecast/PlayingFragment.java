@@ -61,6 +61,7 @@ public class PlayingFragment extends GameFragment{
     private Button mFailMissionButton;
 
     private LinearLayout mPlayerButtonsContainer;
+    private LinearLayout mExtraInfoContainer;
 
     private static final int SELECTION_PHASE = 0;
     private static final int VOTING_PHASE = 1;
@@ -88,6 +89,7 @@ public class PlayingFragment extends GameFragment{
 
         mPlayerRoleTextView = (TextView) view.findViewById(R.id.roleTextView);
         mMissionTeamSizeView = (TextView) view.findViewById(R.id.missionTeamSizeView);
+
         mSubmitSelectionButton = (Button) view.findViewById(R.id.submitSelectionButton);
         mApproveSelectionButton = (Button) view.findViewById(R.id.approveSelectionButton);
         mRejectSelectionButton = (Button) view.findViewById(R.id.rejectSelectionButton);
@@ -95,6 +97,7 @@ public class PlayingFragment extends GameFragment{
         mFailMissionButton = (Button) view.findViewById(R.id.failMissionButton);
 
         mPlayerButtonsContainer = (LinearLayout) view.findViewById(R.id.playerButtonsContainer);
+        mExtraInfoContainer = (LinearLayout) view.findViewById(R.id.extraInfoContainer);
 
         mSubmitSelectionButton.setVisibility(View.GONE);
         mApproveSelectionButton.setVisibility(View.GONE);
@@ -103,7 +106,7 @@ public class PlayingFragment extends GameFragment{
         mFailMissionButton.setVisibility(View.GONE);
 
         mMissionTeamSizeView.setVisibility(View.GONE);
-
+        mExtraInfoContainer.setVisibility(View.GONE);
 
         mSubmitSelectionButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -208,7 +211,11 @@ public class PlayingFragment extends GameFragment{
     private void initialize(GameManagerState gameState, JSONObject gameData) {
         //display loyalty
         PlayerInfo player = gameState.getPlayer(((MainActivity) getActivity()).getPlayerId());
+        List<PlayerInfo> players = gameState.getPlayersInState(GameManagerClient.PLAYER_STATE_PLAYING);
+
         String loyalty = "";
+        String myPlayerId = ((MainActivity) getActivity()).getPlayerId();
+
         if(player == null){
             Log.d(TAG, "player is somehow null in initialize()");
             return;
@@ -224,13 +231,35 @@ public class PlayingFragment extends GameFragment{
 
         mPlayerRoleTextView.setText(loyalty);
         mMissionTeamSizeView.setText("");
+
+        if(loyalty.equals("evil")){
+            TextView evilHeader = new TextView(getActivity());
+            evilHeader.setText("Fellow traitors: ");
+            for(int i=0; i<players.size(); i++){
+                String currPlayerId = players.get(i).getPlayerId();
+                String currPlayerLoyalty = "";
+                String currPlayerName = "";
+                try {
+                    currPlayerLoyalty = players.get(i).getPlayerData().getString("loyalty");
+                    currPlayerName = players.get(i).getPlayerData().getString("name");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                if(currPlayerLoyalty.equals("evil") && !myPlayerId.equals(currPlayerId)){
+                    TextView evils = new TextView(getActivity());
+                    evils.setText(currPlayerName);
+                    mExtraInfoContainer.addView(evils);
+                }
+            }
+        }
+
+
     }
 
     /**
      * Handle selection phase.
      */
     public void selectionPhase(GameManagerState gameState, JSONObject gameData){
-
         Log.d(TAG, "gameData: " + gameData.toString());
 
         mApproveSelectionButton.setVisibility(View.GONE);
@@ -239,7 +268,6 @@ public class PlayingFragment extends GameFragment{
         mFailMissionButton.setVisibility(View.GONE);
 
         try {
-
             String leaderId = gameData.getString("leader");
             Log.d(TAG, "Leader id: " + leaderId);
             String playerId = ((MainActivity) getActivity()).getPlayerId();
@@ -561,5 +589,7 @@ public class PlayingFragment extends GameFragment{
             }
         });
     }
+
+
 
 }

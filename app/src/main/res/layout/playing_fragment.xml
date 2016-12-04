@@ -26,11 +26,19 @@
         android:textStyle="bold"
         />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/extraInfoContainer"
+        android:orientation="vertical"
+        android:layout_below="@+id/roleTextView"
+        />
+
     <TextView
         android:text="Mission team size: "
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/roleTextView"
+        android:layout_below="@+id/extraInfoContainer"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="11dp"
         android:id="@+id/missionTeamSizeView"
