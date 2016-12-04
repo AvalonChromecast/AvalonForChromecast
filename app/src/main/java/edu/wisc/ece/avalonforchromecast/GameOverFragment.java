@@ -114,6 +114,6 @@ public class GameOverFragment extends GameFragment{
      * Move the players back to lobby.
      */
     public void onLobbyButtonClicked(){
-        
+
     }
 }

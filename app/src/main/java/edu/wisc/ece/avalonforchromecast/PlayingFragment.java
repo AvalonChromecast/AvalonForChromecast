@@ -143,6 +143,11 @@ public class PlayingFragment extends GameFragment{
         GameManagerState state = gameManagerClient.getCurrentState();
         JSONObject gameData = state.getGameData();
 
+        if(!initialized){
+            initialize(state, gameData);
+            initialized = false;
+        }
+
         try {
             int gamePhase = gameData.getInt("phase");
             Log.d(TAG, "game phase:" + gamePhase);
@@ -155,11 +160,9 @@ public class PlayingFragment extends GameFragment{
             else if(gamePhase == MISSION_PHASE){
                 missionPhase(state, gameData);
             }
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
     }
 
 
@@ -220,10 +223,6 @@ public class PlayingFragment extends GameFragment{
     public void selectionPhase(GameManagerState gameState, JSONObject gameData){
 
         Log.d(TAG, "gameData: " + gameData.toString());
-        if(!initialized){
-            initialize(gameState, gameData);
-            initialized = false;
-        }
 
         mApproveSelectionButton.setVisibility(View.GONE);
         mRejectSelectionButton.setVisibility(View.GONE);
