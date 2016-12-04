@@ -140,6 +140,10 @@ public class PlayingFragment extends GameFragment{
         super.onStart();
 
         GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
+        if(gameManagerClient == null){
+            Log.d(TAG, "gameManagerClient in onStart is somehow null.");
+            return;
+        }
         GameManagerState state = gameManagerClient.getCurrentState();
         JSONObject gameData = state.getGameData();
 
