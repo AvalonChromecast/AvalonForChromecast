@@ -137,8 +137,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
         if (isChangingConfigurations() || isFinishing() || isDestroyed()) {
             return;
         }
-
-
         Fragment fragment;
         if (!mCastConnectionManager.isConnectedToReceiver()) {
             mPlayerName = null;

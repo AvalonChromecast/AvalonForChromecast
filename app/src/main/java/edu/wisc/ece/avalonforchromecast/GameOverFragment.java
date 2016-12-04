@@ -125,7 +125,7 @@ public class GameOverFragment extends GameFragment{
      * Move the players back to lobby.
      */
     public void onLobbyButtonClicked(){
-        GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
+        final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
         GameManagerState state = gameManagerClient.getCurrentState();
         JSONObject gameData = state.getGameData();
 
@@ -142,7 +142,8 @@ public class GameOverFragment extends GameFragment{
             @Override
             public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
                 if (gameManagerResult.getStatus().isSuccess()) {
-                    ((MainActivity) getActivity()).updateFragments();
+                    ((MainActivity) getActivity()).setPlayerState(gameManagerClient.getCurrentState().getPlayer(
+                            gameManagerResult.getPlayerId()).getPlayerState());
                 }
                 else {
 

@@ -139,7 +139,7 @@ public class PlayingFragment extends GameFragment{
     public void onStart() {
         super.onStart();
 
-        GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
+        final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
         if(gameManagerClient == null){
             Log.d(TAG, "gameManagerClient in onStart is somehow null.");
             return;
@@ -369,7 +369,7 @@ public class PlayingFragment extends GameFragment{
     //sendRequest json 'missionTeam': missionTeam
     public void onSubmitSelectionClicked(){
         //get number of players can be selected
-        GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
+        final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
         GameManagerState state = gameManagerClient.getCurrentState();
         JSONObject gameData = state.getGameData();
 
@@ -434,7 +434,7 @@ public class PlayingFragment extends GameFragment{
      * Button click handler. Approve team.
      */
     public void onApproveSelectionClicked(){
-        GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
+        final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
         GameManagerState state = gameManagerClient.getCurrentState();
         JSONObject gameData = state.getGameData();
 
@@ -467,7 +467,7 @@ public class PlayingFragment extends GameFragment{
      * Button click handler. Reject team.
      */
     public void onRejectSelectionClicked(){
-        GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
+        final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
         GameManagerState state = gameManagerClient.getCurrentState();
         JSONObject gameData = state.getGameData();
 
@@ -500,7 +500,7 @@ public class PlayingFragment extends GameFragment{
      * Button click handler. Pass mission.
      */
     public void onPassMissionClicked(){
-        GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
+        final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
         GameManagerState state = gameManagerClient.getCurrentState();
         JSONObject gameData = state.getGameData();
 
@@ -533,7 +533,7 @@ public class PlayingFragment extends GameFragment{
      * Button click handler. Fail mission.
      */
     public void onFailMissionClicked(){
-        GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
+        final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
         GameManagerState state = gameManagerClient.getCurrentState();
         JSONObject gameData = state.getGameData();
 
