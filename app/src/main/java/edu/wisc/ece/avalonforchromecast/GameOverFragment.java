@@ -68,39 +68,11 @@ public class GameOverFragment extends GameFragment{
 
         mLobbyButton = (Button) view.findViewById(R.id.lobbyButton);
 
-        Log.d(TAG, "Inside onCreateView - gameoverfragment");
-
-//
-//        GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
-//        if(gameManagerClient == null){
-//            Log.d(TAG, "gamemanagerClient is somehow null.");
-//            return view;
-//        }
-//        GameManagerState state = gameManagerClient.getCurrentState();
-//        JSONObject gameData = state.getGameData();
-//
-//        boolean goodWins = false;
-//        try {
-//            goodWins = gameData.getBoolean("goodWins");
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//
-//        String loyalty = ((MainActivity) getActivity()).getLoyalty();
-//        boolean isGood = false;
-//        if(loyalty.equals("good")){
-//            isGood = true;
-//        }
-//        else if(loyalty.equals("evil")){
-//            isGood = false;
-//        }
-//
-//        if(goodWins == isGood){
-//            mGameOverView.setText("You are on the winning team");
-//        }
-//        else{
-//            mGameOverView.setText("You are on the losing team");
-//        }
+        mLobbyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {onLobbyButtonClicked();
+            }
+        });
 
         return view;
     }
@@ -147,13 +119,36 @@ public class GameOverFragment extends GameFragment{
     @Override
     public void onStateChanged(GameManagerState newState,
                                GameManagerState oldState) {
-
     }
 
     /**
      * Move the players back to lobby.
      */
     public void onLobbyButtonClicked(){
+        GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
+        GameManagerState state = gameManagerClient.getCurrentState();
+        JSONObject gameData = state.getGameData();
+
+        JSONObject reset = new JSONObject();
+        try {
+            reset.put("reset", true);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        PendingResult<GameManagerClient.GameManagerResult> result =
+                gameManagerClient.sendGameRequest(reset);
+        result.setResultCallback(new ResultCallback<GameManagerClient.GameManagerResult>() {
+            @Override
+            public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
+                if (gameManagerResult.getStatus().isSuccess()) {
+                    ((MainActivity) getActivity()).updateFragments();
+                }
+                else {
+
+                }
+            }
+        });
 
     }
 }
