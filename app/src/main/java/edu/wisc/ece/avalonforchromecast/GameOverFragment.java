@@ -44,7 +44,7 @@ public class GameOverFragment extends GameFragment{
     private static final String TAG = "LobbyFragment";
 
     private TextView mGameOverView;
-
+    private Button mLobbyButton;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -62,9 +62,14 @@ public class GameOverFragment extends GameFragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment.
-        View view = inflater.inflate(R.layout.playing_fragment, container, false);
+        View view = inflater.inflate(R.layout.game_over_fragment, container, false);
 
         mGameOverView = (TextView) view.findViewById(R.id.gameOverView);
+
+        mLobbyButton = (Button) view.findViewById(R.id.lobbyButton);
+
+        Log.d(TAG, "Inside onCreateView - gameoverfragment");
+
 //
 //        GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
 //        if(gameManagerClient == null){
