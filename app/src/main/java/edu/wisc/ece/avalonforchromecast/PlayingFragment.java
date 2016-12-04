@@ -154,7 +154,7 @@ public class PlayingFragment extends GameFragment{
 
         try {
             int gamePhase = gameData.getInt("phase");
-            Log.d(TAG, "game phase:" + gamePhase);
+            //Log.d(TAG, "game phase:" + gamePhase);
             if(gamePhase == SELECTION_PHASE){
                 selectionPhase(state, gameData);
             }
@@ -209,6 +209,11 @@ public class PlayingFragment extends GameFragment{
         //display loyalty
         PlayerInfo player = gameState.getPlayer(((MainActivity) getActivity()).getPlayerId());
         String loyalty = "";
+        if(player == null){
+            Log.d(TAG, "player is somehow null in initialize()");
+            return;
+        }
+
         try {
             loyalty = player.getPlayerData().getString("loyalty");
         } catch (JSONException e) {
@@ -272,7 +277,15 @@ public class PlayingFragment extends GameFragment{
                     playerButton.setTag(player.getPlayerId());
                     mPlayerButtonsContainer.addView(playerButton);
                 }
-                mMissionTeamSizeView.setText("Select " + players.size() + " people for the mission");
+
+                int teamSize = 0;
+                try {
+                    teamSize = gameData.getInt("missionTeamSize");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                mMissionTeamSizeView.setText("Select " + teamSize + " people for the mission");
             }
             else{
                 //do nothing
