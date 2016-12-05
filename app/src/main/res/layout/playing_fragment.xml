@@ -8,15 +8,14 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
 
-    android:background="@color/blue"
-
     tools:context="edu.wisc.ece.avalonforchromecast.GameFragment">
 
     <Button
         android:text="Hide"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/showHideButton" />
+        android:id="@+id/showHideButton"
+        android:layout_alignParentRight="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -27,9 +26,8 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
 
-        android:textColor="@color/white"
-        android:textStyle="bold"
-        />
+        android:textColor="@android:color/white"
+        android:textStyle="bold" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -62,7 +60,8 @@
         android:layout_height="wrap_content"
         android:text="Approve"
         android:id="@+id/approveSelectionButton"
-        android:layout_alignParentBottom="true" />
+        android:layout_alignParentBottom="true"
+        android:background="@android:color/holo_green_dark"/>
 
     <Button
         android:layout_width="wrap_content"
@@ -70,14 +69,16 @@
         android:text="Reject"
         android:id="@+id/rejectSelectionButton"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:background="@android:color/holo_red_dark"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Pass"
         android:id="@+id/passMissionButton"
-        android:layout_alignParentBottom="true"/>
+        android:layout_alignParentBottom="true"
+        android:background="@android:color/holo_green_dark"/>
 
     <Button
         android:layout_width="wrap_content"
@@ -85,7 +86,8 @@
         android:text="Fail"
         android:id="@+id/failMissionButton"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:background="@android:color/holo_red_dark"/>
 
     <ScrollView
         android:layout_width="match_parent"

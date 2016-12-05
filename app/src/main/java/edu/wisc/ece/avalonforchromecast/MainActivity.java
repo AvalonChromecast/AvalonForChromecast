@@ -45,7 +45,10 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
     private CastConnectionManager mCastConnectionManager;
 
-    private static final int GAMEOVER_PHASE = 3;
+    private static final int LOBBY_PHASE = 0;
+    private static final int SETTUP_PHASE = 1;
+    private static final int ASSASSIN_PHASE = 5;
+    private static final int GAMEOVER_PHASE = 6;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -149,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
             GameManagerState state = gameManagerClient.getCurrentState();
             JSONObject gameData = state.getGameData();
 
-            int gamePhase = -1;
+            int gamePhase = LOBBY_PHASE;
 
             try {
                 gamePhase = gameData.getInt("phase");
@@ -167,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
                     fragment = mPlayingFragment;
                 }
             }
-            //this happens when player state is ready or game phase is -1
+            //this happens when player state is ready or game phase is LOBBY_PHASE
             else {
                 fragment = mLobbyFragment;
             }

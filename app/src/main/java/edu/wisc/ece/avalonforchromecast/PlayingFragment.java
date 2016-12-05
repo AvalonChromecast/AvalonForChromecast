@@ -65,9 +65,9 @@ public class PlayingFragment extends GameFragment{
     private LinearLayout mPlayerButtonsContainer;
     private LinearLayout mExtraInfoContainer;
 
-    private static final int SELECTION_PHASE = 0;
-    private static final int VOTING_PHASE = 1;
-    private static final int MISSION_PHASE = 2;
+    private static final int SELECTION_PHASE = 2;
+    private static final int VOTING_PHASE = 3;
+    private static final int MISSION_PHASE = 4;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -221,15 +221,14 @@ public class PlayingFragment extends GameFragment{
     private void initialize(GameManagerState gameState, JSONObject gameData) {
         //display loyalty
         PlayerInfo player = gameState.getPlayer(((MainActivity) getActivity()).getPlayerId());
-        List<PlayerInfo> players = gameState.getPlayersInState(GameManagerClient.PLAYER_STATE_PLAYING);
-
-        String loyalty = "";
-        String myPlayerId = ((MainActivity) getActivity()).getPlayerId();
-
         if(player == null){
             Log.d(TAG, "player is somehow null in initialize()");
             return;
         }
+        List<PlayerInfo> players = gameState.getPlayersInState(GameManagerClient.PLAYER_STATE_PLAYING);
+
+        String loyalty = "";
+        String myPlayerId = ((MainActivity) getActivity()).getPlayerId();
 
         try {
             loyalty = player.getPlayerData().getString("loyalty");
@@ -392,8 +391,6 @@ public class PlayingFragment extends GameFragment{
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-
     }
 
     public void onShowHideButtonClicked(){
@@ -408,7 +405,6 @@ public class PlayingFragment extends GameFragment{
             mExtraInfoContainer.setVisibility(View.GONE);
         }
     }
-
 
     /**
      * Button click handler. Submit player selection.
