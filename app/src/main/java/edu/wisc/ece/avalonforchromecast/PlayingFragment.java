@@ -232,7 +232,7 @@ public class PlayingFragment extends GameFragment{
         mPlayerRoleTextView.setText(loyalty);
         mMissionTeamSizeView.setText("");
 
-        if(loyalty.equals("evil"){
+        if(loyalty.equals("evil")){
             TextView evilHeader = new TextView(getActivity());
             evilHeader.setText("Fellow traitors: ");
             for(int i=0; i<players.size(); i++){
