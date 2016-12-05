@@ -54,6 +54,8 @@ public class PlayingFragment extends GameFragment{
 
     private TextView mPlayerRoleTextView;
     private TextView mMissionTeamSizeView;
+
+    private Button mShowHideButton;
     private Button mSubmitSelectionButton;
     private Button mApproveSelectionButton;
     private Button mRejectSelectionButton;
@@ -90,6 +92,7 @@ public class PlayingFragment extends GameFragment{
         mPlayerRoleTextView = (TextView) view.findViewById(R.id.roleTextView);
         mMissionTeamSizeView = (TextView) view.findViewById(R.id.missionTeamSizeView);
 
+        mShowHideButton = (Button) view.findViewById(R.id.showHideButton);
         mSubmitSelectionButton = (Button) view.findViewById(R.id.submitSelectionButton);
         mApproveSelectionButton = (Button) view.findViewById(R.id.approveSelectionButton);
         mRejectSelectionButton = (Button) view.findViewById(R.id.rejectSelectionButton);
@@ -107,6 +110,13 @@ public class PlayingFragment extends GameFragment{
 
         mMissionTeamSizeView.setVisibility(View.GONE);
         //mExtraInfoContainer.setVisibility(View.GONE);
+
+        mShowHideButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onShowHideButtonClicked();
+            }
+        });
 
         mSubmitSelectionButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -235,6 +245,7 @@ public class PlayingFragment extends GameFragment{
         if(loyalty.equals("evil")){
             TextView evilHeader = new TextView(getActivity());
             evilHeader.setText("Fellow traitors: ");
+            mExtraInfoContainer.addView(evilHeader);
             for(int i=0; i<players.size(); i++){
                 String currPlayerId = players.get(i).getPlayerId();
                 String currPlayerLoyalty = "";
@@ -252,8 +263,6 @@ public class PlayingFragment extends GameFragment{
                 }
             }
         }
-
-
     }
 
     /**
@@ -386,6 +395,20 @@ public class PlayingFragment extends GameFragment{
 
 
     }
+
+    public void onShowHideButtonClicked(){
+        if(mShowHideButton.getText().equals("Show")){
+            mShowHideButton.setText("Hide");
+            mPlayerRoleTextView.setVisibility(View.VISIBLE);
+            mExtraInfoContainer.setVisibility(View.VISIBLE);
+        }
+        else{
+            mShowHideButton.setText("Show");
+            mPlayerRoleTextView.setVisibility(View.GONE);
+            mExtraInfoContainer.setVisibility(View.GONE);
+        }
+    }
+
 
     /**
      * Button click handler. Submit player selection.

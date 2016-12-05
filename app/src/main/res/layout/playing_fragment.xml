@@ -12,6 +12,11 @@
 
     tools:context="edu.wisc.ece.avalonforchromecast.GameFragment">
 
+    <Button
+        android:text="Hide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/showHideButton" />
 
     <TextView
         android:layout_width="wrap_content"
