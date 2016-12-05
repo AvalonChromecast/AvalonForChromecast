@@ -106,7 +106,7 @@ public class PlayingFragment extends GameFragment{
         mFailMissionButton.setVisibility(View.GONE);
 
         mMissionTeamSizeView.setVisibility(View.GONE);
-        mExtraInfoContainer.setVisibility(View.GONE);
+        //mExtraInfoContainer.setVisibility(View.GONE);
 
         mSubmitSelectionButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -232,7 +232,7 @@ public class PlayingFragment extends GameFragment{
         mPlayerRoleTextView.setText(loyalty);
         mMissionTeamSizeView.setText("");
 
-        if(loyalty.equals("evil")){
+        if(loyalty.equals("evil"){
             TextView evilHeader = new TextView(getActivity());
             evilHeader.setText("Fellow traitors: ");
             for(int i=0; i<players.size(); i++){
