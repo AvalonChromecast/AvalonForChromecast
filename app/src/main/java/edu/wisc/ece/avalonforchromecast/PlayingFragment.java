@@ -182,7 +182,6 @@ public class PlayingFragment extends GameFragment{
         }
     }
 
-
     /**
      * Game state callback handler.
      */
@@ -608,7 +607,4 @@ public class PlayingFragment extends GameFragment{
             }
         });
     }
-
-
-
 }
