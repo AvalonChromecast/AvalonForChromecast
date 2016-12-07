@@ -218,9 +218,17 @@ public class MainActivity extends AppCompatActivity implements Observer {
         mPlayerName = playerName;
     }
 
-    public void setSetupLeader(boolean isLeader){mSetupLeader = isLeader;}
+    public void setSetupLeader(boolean isLeader){
+        Log.d(TAG, "mSetupLeader is now " + isLeader);
+        mSetupLeader = isLeader;
+    }
 
-    public boolean getSetupLeader(){return mSetupLeader;}
+    public boolean getSetupLeader(){
+        if(mSetupLeader == null){
+            Log.e(TAG, "Somehow SetupLeader is null??");
+        }
+        return mSetupLeader;
+    }
 
     public void setLoyalty(String loyalty){
         mLoyalty = loyalty;
