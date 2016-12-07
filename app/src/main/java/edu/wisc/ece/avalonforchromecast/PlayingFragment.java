@@ -260,6 +260,7 @@ public class PlayingFragment extends GameFragment{
 
         mPlayerRoleTextView.setText(loyalty + " - " + role);
         mMissionTeamSizeView.setText("");
+        mExtraInfoContainer.removeAllViews();
 
         boolean isEvil = loyalty.equals("evil");
         boolean isMerlin = role.equals("merlin");
