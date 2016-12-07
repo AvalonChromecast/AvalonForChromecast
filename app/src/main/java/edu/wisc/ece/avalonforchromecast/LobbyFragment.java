@@ -231,10 +231,11 @@ public class LobbyFragment extends GameFragment {
     public void onStateChanged(GameManagerState newState, GameManagerState oldState){
         Log.d(TAG, "Enter lobbyfragment's onStateChanged");
         String playerId = ((MainActivity) getActivity()).getPlayerId();
+        if(newState.hasPlayerStateChanged(playerId, oldState)){
             Log.d(TAG, "Lobbyfragment's updatefragment");
             ((MainActivity) getActivity()).setPlayerState(newState.getPlayer(
                     playerId).getPlayerState());
-
+        }
     }
 
 }

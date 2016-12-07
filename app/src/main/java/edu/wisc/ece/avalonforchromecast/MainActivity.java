@@ -166,7 +166,10 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
             if (mPlayerState == GameManagerClient.PLAYER_STATE_PLAYING) {
                 Log.d(TAG, "Player State is PLAYING");
-                if(gamePhase == GAMEOVER_PHASE){
+                if(gamePhase == SETUP_PHASE){
+                    fragment = mSetupFragment;
+                }
+                else if(gamePhase == GAMEOVER_PHASE){
                     fragment = mGameOverFragment;
                 }
                 else{
@@ -176,11 +179,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
             //this happens when player state is ready or game phase is LOBBY_PHASE
             else {
                 Log.d(TAG, "Player State is READY or AVAILABLE");
-                if(gamePhase == SETUP_PHASE){
-                    fragment = mSetupFragment;
-                } else {
                     fragment = mLobbyFragment;
-                }
             }
         }
         getFragmentManager().beginTransaction()
