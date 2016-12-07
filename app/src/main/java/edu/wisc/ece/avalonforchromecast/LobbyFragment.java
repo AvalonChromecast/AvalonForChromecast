@@ -27,7 +27,7 @@ public class LobbyFragment extends GameFragment {
     private static final String TAG = "LobbyFragment";
 
     private EditText mNameEditText;
-    private Button mJoinButton;
+    private Button mJoinStartButton;
     private ProgressBar mSpinner;
 
     @Override
@@ -44,12 +44,12 @@ public class LobbyFragment extends GameFragment {
 
         mNameEditText = (EditText) view.findViewById(R.id.name);
         mSpinner = (ProgressBar) view.findViewById(R.id.spinner);
-        mJoinButton = (Button) view.findViewById(R.id.button_join);
+        mJoinStartButton = (Button) view.findViewById(R.id.button_join_start);
 
-        mJoinButton.setOnClickListener(new View.OnClickListener() {
+        mJoinStartButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onJoinClicked();
+                onJoinStartClicked();
             }
         });
         return view;
@@ -70,7 +70,7 @@ public class LobbyFragment extends GameFragment {
     /**
      * Button click handler. Set the new player state based on the current player state.
      */
-    private void onJoinClicked() {
+    private void onJoinStartClicked() {
         GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
         GameManagerState state = gameManagerClient.getCurrentState();
 
@@ -84,8 +84,8 @@ public class LobbyFragment extends GameFragment {
                 ((MainActivity) getActivity()).setPlayerName(mNameEditText.getText().toString());
                 sendPlayerReadyRequest();
             }
-        } else  {
-            Log.e(TAG, "Somehow player state was not available???");
+        } else if (playerState == GameManagerClient.PLAYER_STATE_READY) {
+            sendStartGameRequest();
         }
         updateView();
     }
@@ -134,7 +134,45 @@ public class LobbyFragment extends GameFragment {
         updateView();
     }
 
+    /**
+     * Change the player state to PLAYER_STATE_PLAYING.
+     */
+    public void sendStartGameRequest() {
+        final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
+        if (mCastConnectionManager.isConnectedToReceiver()) {
+            // Send player name to the receiver
+            JSONObject jsonMessage = new JSONObject();
+            try {
+                jsonMessage.put("startGame", "true");
+            } catch (JSONException e) {
+                Log.e(TAG, "Error creating JSON message", e);
+                return;
+            }
+            PendingResult<GameManagerClient.GameManagerResult> result =
+                    gameManagerClient.sendGameRequest(jsonMessage);
+            result.setResultCallback(new ResultCallback<GameManagerClient.GameManagerResult>() {
+                @Override
+                public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
+                    if (gameManagerResult.getStatus().isSuccess()) {
+                        Toast.makeText(getActivity(), "Start Game was successful", Toast.LENGTH_SHORT);
+                        ((MainActivity) getActivity())
+                                .setPlayerState(gameManagerClient.getCurrentState().getPlayer(
+                                        gameManagerResult.getPlayerId()).getPlayerState());
 
+                    } else if(gameManagerResult.getStatus().getStatusCode() == GameManagerClient.STATUS_TOO_MANY_PLAYERS){
+                        Toast.makeText(getActivity(), "Please have 5 to 10 players", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        mCastConnectionManager.disconnectFromReceiver(false);
+                        Utils.showErrorDialog(getActivity(),
+                                gameManagerResult.getStatus().getStatusMessage());
+                    }
+                    updateView();
+                }
+            });
+        }
+        updateView();
+    }
 
     /**
      *  Change the player state to PLAYER_STATE_QUIT.
@@ -174,10 +212,16 @@ public class LobbyFragment extends GameFragment {
         if (mCastConnectionManager.isConnectedToReceiver()) {
             GameManagerState gameManagerState = gameManagerClient.getCurrentState();
             if (gameManagerState.getLobbyState() == GameManagerClient.LOBBY_STATE_OPEN) {
-                mJoinButton.setVisibility(View.VISIBLE);
+                mJoinStartButton.setVisibility(View.VISIBLE);
                 mSpinner.setVisibility(View.GONE);
+                if (playerState == GameManagerClient.PLAYER_STATE_AVAILABLE) {
+                    mJoinStartButton.setText(R.string.button_join);
+                } else if (playerState == GameManagerClient.PLAYER_STATE_READY) {
+                    mJoinStartButton.setText(R.string.button_start);
+                }
             } else {
-                mJoinButton.setVisibility(View.GONE);
+                mJoinStartButton.setVisibility(View.GONE);
+                mSpinner.setVisibility(View.VISIBLE);
             }
         }
     }
