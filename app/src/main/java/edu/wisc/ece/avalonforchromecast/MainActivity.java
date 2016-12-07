@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private String mPlayerName;
     private String mPlayerId;
     private String mLoyalty;
+    private Boolean mSetupLeader;
 
     private CastConnectionManager mCastConnectionManager;
 
@@ -164,6 +165,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
             Log.d(TAG, "gamePhase is " + gamePhase);
 
             if (mPlayerState == GameManagerClient.PLAYER_STATE_PLAYING) {
+                Log.d(TAG, "Player State is PLAYING");
                 if(gamePhase == GAMEOVER_PHASE){
                     fragment = mGameOverFragment;
                 }
@@ -173,6 +175,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
             }
             //this happens when player state is ready or game phase is LOBBY_PHASE
             else {
+                Log.d(TAG, "Player State is READY or AVAILABLE");
                 if(gamePhase == SETUP_PHASE){
                     fragment = mSetupFragment;
                 } else {
@@ -213,6 +216,10 @@ public class MainActivity extends AppCompatActivity implements Observer {
     public void setPlayerName(String playerName) {
         mPlayerName = playerName;
     }
+
+    public void setSetupLeader(boolean isLeader){mSetupLeader = isLeader;}
+
+    public boolean getSetupLeader(){return mSetupLeader;}
 
     public void setLoyalty(String loyalty){
         mLoyalty = loyalty;

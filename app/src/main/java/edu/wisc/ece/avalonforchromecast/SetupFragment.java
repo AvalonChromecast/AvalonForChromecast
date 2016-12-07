@@ -103,17 +103,9 @@ public class SetupFragment extends GameFragment {
         GameManagerState state = gameManagerClient.getCurrentState();
         JSONObject gameData = state.getGameData();
 
-        String setupLeaderId = "";
-        String setupLeaderName = "";
-        try {
-            setupLeaderId = gameData.getString("setupLeader");
-            setupLeaderName = gameData.getString("setupLeaderName");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        String playerId = ((MainActivity) getActivity()).getPlayerId();
-        if(!playerId.equals(setupLeaderId)){
-            mTitleTextView.setText("Wait for " + setupLeaderName + " to start the game.");
+
+        if(!((MainActivity)getActivity()).getSetupLeader()){
+            mTitleTextView.setText("Wait for setup leader to start the game.");
             mMerlinCheckBox.setVisibility(View.GONE);
             mAssassinCheckBox.setVisibility(View.GONE);
             mPercivalCheckBox.setVisibility(View.GONE);

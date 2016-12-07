@@ -154,7 +154,8 @@ public class LobbyFragment extends GameFragment {
                 @Override
                 public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
                     if (gameManagerResult.getStatus().isSuccess()) {
-                        Toast.makeText(getActivity(), "Start Game was successful", Toast.LENGTH_SHORT);
+                        Toast.makeText(getActivity(), "Start Game success, you're setup leader", Toast.LENGTH_SHORT);
+                        ((MainActivity) getActivity()).setSetupLeader(true);
                         ((MainActivity) getActivity())
                                 .setPlayerState(gameManagerClient.getCurrentState().getPlayer(
                                         gameManagerResult.getPlayerId()).getPlayerState());
@@ -228,12 +229,12 @@ public class LobbyFragment extends GameFragment {
 
     @Override
     public void onStateChanged(GameManagerState newState, GameManagerState oldState){
-        //Log.d(TAG, "Enter lobbyfragment's onStateChanged");
+        Log.d(TAG, "Enter lobbyfragment's onStateChanged");
         String playerId = ((MainActivity) getActivity()).getPlayerId();
         if(newState.hasPlayerStateChanged(playerId, oldState)){
+            Log.d(TAG, "Lobbyfragment's updatefragment");
             ((MainActivity) getActivity()).setPlayerState(newState.getPlayer(
                     playerId).getPlayerState());
-            //Log.d(TAG, "Lobbyfragment's updatefragment");
         }
     }
 
