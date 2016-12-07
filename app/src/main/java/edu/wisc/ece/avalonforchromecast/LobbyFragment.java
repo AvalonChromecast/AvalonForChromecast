@@ -140,6 +140,8 @@ public class LobbyFragment extends GameFragment {
     public void sendStartGameRequest() {
         final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
         if (mCastConnectionManager.isConnectedToReceiver()) {
+
+            ((MainActivity) getActivity()).setSetupLeader(true);
             // Send player name to the receiver
             JSONObject jsonMessage = new JSONObject();
             try {
@@ -155,7 +157,6 @@ public class LobbyFragment extends GameFragment {
                 public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
                     if (gameManagerResult.getStatus().isSuccess()) {
                         Toast.makeText(getActivity(), "Start Game success, you're setup leader", Toast.LENGTH_SHORT);
-                        ((MainActivity) getActivity()).setSetupLeader(true);
                         ((MainActivity) getActivity())
                                 .setPlayerState(gameManagerClient.getCurrentState().getPlayer(
                                         gameManagerResult.getPlayerId()).getPlayerState());
@@ -164,6 +165,8 @@ public class LobbyFragment extends GameFragment {
                         Toast.makeText(getActivity(), "Please have 5 to 10 players", Toast.LENGTH_SHORT).show();
                     }
                     else {
+
+                        ((MainActivity) getActivity()).setSetupLeader(false);
                         mCastConnectionManager.disconnectFromReceiver(false);
                         Utils.showErrorDialog(getActivity(),
                                 gameManagerResult.getStatus().getStatusMessage());
