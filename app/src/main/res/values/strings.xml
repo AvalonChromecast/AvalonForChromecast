@@ -10,6 +10,7 @@
     <string name="connect_label">Connect to the Google Cast device to start playing</string>
     <string name="game_connection_error_message">Game Connection Error</string>
     <string name="enter_your_name">Enter your name</string>
+    <string name="game_dialog_ok_button_text">OK??</string>
 
     <string name="clear">Clear</string>
     <string name="done">Done</string>

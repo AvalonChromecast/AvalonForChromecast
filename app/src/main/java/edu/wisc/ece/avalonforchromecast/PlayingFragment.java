@@ -68,6 +68,7 @@ public class PlayingFragment extends GameFragment{
     private static final int SELECTION_PHASE = 2;
     private static final int VOTING_PHASE = 3;
     private static final int MISSION_PHASE = 4;
+    private static final int ASSASSIN_PHASE = 5;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

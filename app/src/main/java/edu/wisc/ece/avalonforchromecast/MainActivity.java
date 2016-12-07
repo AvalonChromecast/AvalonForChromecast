@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private CastConnectionFragment mCastConnectionFragment;
     private LobbyFragment mLobbyFragment;
     private PlayingFragment mPlayingFragment;
+    private SetupFragment mSetupFragment;
     private GameOverFragment mGameOverFragment;
     private int mPlayerState = GameManagerClient.PLAYER_STATE_UNKNOWN;
     private String mPlayerName;
@@ -46,8 +47,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private CastConnectionManager mCastConnectionManager;
 
     private static final int LOBBY_PHASE = 0;
-    private static final int SETTUP_PHASE = 1;
-    private static final int ASSASSIN_PHASE = 5;
+    private static final int SETUP_PHASE = 1;
     private static final int GAMEOVER_PHASE = 6;
 
     @Override
@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         mCastConnectionFragment = new CastConnectionFragment();
         mPlayingFragment = new PlayingFragment();
         mLobbyFragment = new LobbyFragment();
+        mSetupFragment = new SetupFragment();
         mGameOverFragment = new GameOverFragment();
 
         updateFragments();
@@ -172,7 +173,11 @@ public class MainActivity extends AppCompatActivity implements Observer {
             }
             //this happens when player state is ready or game phase is LOBBY_PHASE
             else {
-                fragment = mLobbyFragment;
+                if(gamePhase == SETUP_PHASE){
+                    fragment = mSetupFragment;
+                } else {
+                    fragment = mLobbyFragment;
+                }
             }
         }
         getFragmentManager().beginTransaction()

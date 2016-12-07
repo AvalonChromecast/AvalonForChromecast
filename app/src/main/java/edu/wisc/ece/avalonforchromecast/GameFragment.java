@@ -59,7 +59,9 @@ public class GameFragment extends Fragment implements Observer, GameManagerClien
     @Override
     public void onStateChanged(GameManagerState newState,
             GameManagerState oldState) {
-        // no-op
+        ((MainActivity) getActivity())
+                .setPlayerState(newState.getPlayer(
+                        ((MainActivity) getActivity()).getPlayerId()).getPlayerState());
     }
 
     /**
