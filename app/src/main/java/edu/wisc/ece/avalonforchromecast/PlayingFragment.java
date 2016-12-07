@@ -29,6 +29,8 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -61,9 +63,11 @@ public class PlayingFragment extends GameFragment{
     private Button mRejectSelectionButton;
     private Button mPassMissionButton;
     private Button mFailMissionButton;
+    private Button mSubmitAssassinButton;
 
     private LinearLayout mPlayerButtonsContainer;
     private LinearLayout mExtraInfoContainer;
+    private RadioGroup mTargetsContainer;
 
     private static final int SELECTION_PHASE = 2;
     private static final int VOTING_PHASE = 3;
@@ -99,15 +103,18 @@ public class PlayingFragment extends GameFragment{
         mRejectSelectionButton = (Button) view.findViewById(R.id.rejectSelectionButton);
         mPassMissionButton = (Button) view.findViewById(R.id.passMissionButton);
         mFailMissionButton = (Button) view.findViewById(R.id.failMissionButton);
+        mSubmitAssassinButton = (Button) view.findViewById(R.id.submitAssassinButton);
 
         mPlayerButtonsContainer = (LinearLayout) view.findViewById(R.id.playerButtonsContainer);
         mExtraInfoContainer = (LinearLayout) view.findViewById(R.id.extraInfoContainer);
+        mTargetsContainer = (RadioGroup) view.findViewById(R.id.targetsContainer);
 
         mSubmitSelectionButton.setVisibility(View.GONE);
         mApproveSelectionButton.setVisibility(View.GONE);
         mRejectSelectionButton.setVisibility(View.GONE);
         mPassMissionButton.setVisibility(View.GONE);
         mFailMissionButton.setVisibility(View.GONE);
+        mSubmitAssassinButton.setVisibility(View.GONE);
 
         mMissionTeamSizeView.setVisibility(View.GONE);
         //mExtraInfoContainer.setVisibility(View.GONE);
@@ -145,6 +152,11 @@ public class PlayingFragment extends GameFragment{
             public void onClick(View v) {onFailMissionClicked();
             }
         });
+        mSubmitAssassinButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {onSubmitAssassinClicked();
+            }
+        });
 
         return view;
     }
@@ -178,6 +190,9 @@ public class PlayingFragment extends GameFragment{
             else if(gamePhase == MISSION_PHASE){
                 missionPhase(state, gameData);
             }
+            else if(gamePhase == ASSASSIN_PHASE){
+                assassinPhase(state, gameData);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -204,6 +219,9 @@ public class PlayingFragment extends GameFragment{
                     else if(gamePhase == MISSION_PHASE){
                         missionPhase(newState, gameData);
                     }
+                    else if(gamePhase == ASSASSIN_PHASE){
+                        assassinPhase(newState, gameData);
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -228,22 +246,32 @@ public class PlayingFragment extends GameFragment{
         List<PlayerInfo> players = gameState.getPlayersInState(GameManagerClient.PLAYER_STATE_PLAYING);
 
         String loyalty = "";
+        String role = "";
         String myPlayerId = ((MainActivity) getActivity()).getPlayerId();
 
         try {
             loyalty = player.getPlayerData().getString("loyalty");
+            role = player.getPlayerData().getString("role");
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
         ((MainActivity) getActivity()).setLoyalty(loyalty);
 
-        mPlayerRoleTextView.setText(loyalty);
+        mPlayerRoleTextView.setText(loyalty + " - " + role);
         mMissionTeamSizeView.setText("");
 
-        if(loyalty.equals("evil")){
+        boolean isEvil = loyalty.equals("evil");
+        boolean isMerlin = role.equals("merlin");
+
+        if(isEvil || isMerlin){
             TextView evilHeader = new TextView(getActivity());
-            evilHeader.setText("Fellow traitors: ");
+            if(isEvil){
+                evilHeader.setText("Fellow traitors: ");
+            }
+            else if(isMerlin){
+                evilHeader.setText("Traitors: ");
+            }
             mExtraInfoContainer.addView(evilHeader);
             for(int i=0; i<players.size(); i++){
                 String currPlayerId = players.get(i).getPlayerId();
@@ -390,6 +418,64 @@ public class PlayingFragment extends GameFragment{
             }
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void assassinPhase(GameManagerState gameState, JSONObject gameData){
+        mApproveSelectionButton.setVisibility(View.GONE);
+        mRejectSelectionButton.setVisibility(View.GONE);
+        mPassMissionButton.setVisibility(View.GONE);
+        mFailMissionButton.setVisibility(View.GONE);
+
+        PlayerInfo myPlayerInfo = gameState.getPlayer(((MainActivity) getActivity()).getPlayerId());
+        String myRole = "";
+        try {
+            myRole = myPlayerInfo.getPlayerData().getString("role");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        if(myRole.equals("assassin")) {
+            Vibrator v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+            // Vibrate for 250 milliseconds
+            v.vibrate(250);
+
+            Toast.makeText(getActivity(), "Your are the assassin", Toast.LENGTH_LONG).show();
+            //leader view
+            //remove extra buttons when entering this phase again
+            mMissionTeamSizeView.setVisibility(View.VISIBLE);
+            mPlayerButtonsContainer.removeAllViews();
+            mPlayerButtonsContainer.setVisibility(View.VISIBLE);
+            mSubmitSelectionButton.setVisibility(View.GONE);
+
+            //get list of playing players
+            List<PlayerInfo> players = gameState.getPlayersInState(GameManagerClient.PLAYER_STATE_PLAYING);
+            //make radio button for each player
+            for (int i = 0; i < players.size(); i++) {
+                PlayerInfo player = players.get(i);
+                Log.d(TAG, "playerData: " + player.getPlayerData().toString());
+                String playerLoyalty = "";
+                String playerName = "";
+                try {
+                    playerLoyalty = player.getPlayerData().getString("loyalty");
+                    playerName = player.getPlayerData().getString("name");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Log.e(TAG, "Unable to access 'name' from PlayerInfo");
+                }
+                if(playerLoyalty.equals("good")) {
+                    RadioButton playerButton = new RadioButton(getActivity());
+                    playerButton.setText(playerName);
+                    playerButton.setTag(player.getPlayerId());
+                    mTargetsContainer.addView(playerButton);
+                }
+            }
+
+            mMissionTeamSizeView.setText("Choose your assassination target.");
+        }
+        else{
+            //do nothing
+            Toast.makeText(getActivity(), "You are not the assassin", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -601,6 +687,41 @@ public class PlayingFragment extends GameFragment{
                     Toast.makeText(getActivity(), "You failed the mission", Toast.LENGTH_SHORT).show();
                     mPassMissionButton.setVisibility(View.GONE);
                     mFailMissionButton.setVisibility(View.GONE);
+                }
+                else {
+
+                }
+            }
+        });
+    }
+
+    /**
+     * Button click handler. Submit assassination target
+     */
+    public void onSubmitAssassinClicked(){
+        final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
+        GameManagerState state = gameManagerClient.getCurrentState();
+        JSONObject gameData = state.getGameData();
+
+        RadioButton targetButton = (RadioButton) getActivity().
+                findViewById(mTargetsContainer.getCheckedRadioButtonId());
+
+        String targetId = (String) targetButton.getTag();
+
+        JSONObject jsonMessage = new JSONObject();
+        try {
+            jsonMessage.put("assassinGuess", targetId);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        PendingResult<GameManagerClient.GameManagerResult> result =
+                gameManagerClient.sendGameRequest(jsonMessage);
+        result.setResultCallback(new ResultCallback<GameManagerClient.GameManagerResult>() {
+            @Override
+            public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
+                if (gameManagerResult.getStatus().isSuccess()) {
+                    Toast.makeText(getActivity(), "You assassinate someone", Toast.LENGTH_SHORT).show();
                 }
                 else {
 
