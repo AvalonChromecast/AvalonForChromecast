@@ -447,10 +447,12 @@ public class PlayingFragment extends GameFragment{
             mMissionTeamSizeView.setVisibility(View.VISIBLE);
             mPlayerButtonsContainer.removeAllViews();
             mPlayerButtonsContainer.setVisibility(View.VISIBLE);
+            mTargetsContainer.setVisibility(View.VISIBLE);
             mSubmitSelectionButton.setVisibility(View.GONE);
 
             //get list of playing players
             List<PlayerInfo> players = gameState.getPlayersInState(GameManagerClient.PLAYER_STATE_PLAYING);
+            Log.d(TAG, "Players size in assassin mode: " + players.size());
             //make radio button for each player
             for (int i = 0; i < players.size(); i++) {
                 PlayerInfo player = players.get(i);
@@ -469,6 +471,7 @@ public class PlayingFragment extends GameFragment{
                     playerButton.setText(playerName);
                     playerButton.setTag(player.getPlayerId());
                     mTargetsContainer.addView(playerButton);
+                    Log.d(TAG, "current good person: " + playerName);
                 }
             }
 
