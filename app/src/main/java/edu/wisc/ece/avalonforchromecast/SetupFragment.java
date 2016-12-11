@@ -44,6 +44,14 @@ public class SetupFragment extends GameFragment {
 
     private Button mSubmitButton;
 
+    private final int MERLIN_INDEX = 0;
+    private final int ASSASSIN_INDEX = 1;
+    private final int PERCIVAL_INDEX = 2;
+    private final int MORDRED_INDEX = 3;
+    private final int OBERON_INDEX = 4;
+    private final int MORGANA_INDEX = 5;
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,6 +74,13 @@ public class SetupFragment extends GameFragment {
         mMordredCheckBox = (CheckBox) view.findViewById(R.id.mordredCheckbox);
         mOberonCheckBox = (CheckBox) view.findViewById(R.id.oberonCheckbox);
         mMorganaCheckBox = (CheckBox) view.findViewById(R.id.morganaCheckbox);
+
+        mMerlinCheckBox.setTag(MERLIN_INDEX);
+        mAssassinCheckBox.setTag(ASSASSIN_INDEX);
+        mPercivalCheckBox.setTag(PERCIVAL_INDEX);
+        mMordredCheckBox.setTag(MORDRED_INDEX);
+        mOberonCheckBox.setTag(OBERON_INDEX);
+        mMorganaCheckBox.setTag(MORGANA_INDEX);
 
         mSubmitButton = (Button) view.findViewById(R.id.submitButton);
 
@@ -122,6 +137,8 @@ public class SetupFragment extends GameFragment {
     private void onSubmitClicked() {
         final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
         if (mCastConnectionManager.isConnectedToReceiver()) {
+            // rolesArray
+            boolean[] rolesArray = new boolean[6];
             // create array of selected roles
             ArrayList<String> selectedRoles = new ArrayList<>();
             ArrayList<View> roleButtons;
@@ -130,9 +147,13 @@ public class SetupFragment extends GameFragment {
             for(int i = 0; i < roleButtons.size(); i++){
                 CheckBox currRole = (CheckBox) roleButtons.get(i);
                 if(currRole.isChecked()){
-                    selectedRoles.add(((String)currRole.getText()).toLowerCase());
+                    String roleName = ((String)currRole.getText()).toLowerCase();
+                    selectedRoles.add(roleName);
+                    rolesArray[(int)currRole.getTag()] = true;
                 }
             }
+            //update mRolesArray
+            ((MainActivity)getActivity()).setRolesArray(rolesArray);
             // Send selected roles to the receiver
             JSONObject jsonMessage = new JSONObject();
             try {

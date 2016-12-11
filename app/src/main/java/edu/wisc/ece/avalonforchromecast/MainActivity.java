@@ -24,6 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -43,7 +44,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private String mPlayerName;
     private String mPlayerId;
     private String mLoyalty;
-    private Boolean mSetupLeader;
+    private boolean mSetupLeader;
+    private boolean[] mRolesArray;
 
     private CastConnectionManager mCastConnectionManager;
 
@@ -224,9 +226,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
     }
 
     public boolean getSetupLeader(){
-        if(mSetupLeader == null){
-            Log.e(TAG, "Somehow SetupLeader is null??");
-        }
         return mSetupLeader;
     }
 
@@ -236,4 +235,10 @@ public class MainActivity extends AppCompatActivity implements Observer {
     public String getLoyalty(){
         return mLoyalty;
     }
+
+    public void setRolesArray(boolean[] rolesArray) {
+        System.arraycopy(rolesArray, 0, mRolesArray, 0, 6);
+    }
+
+    public boolean[] getRolesArray(){return mRolesArray;};
 }

@@ -239,7 +239,11 @@ public class LobbyFragment extends GameFragment {
             ((MainActivity) getActivity()).setPlayerState(newState.getPlayer(
                     playerId).getPlayerState());
         }
-        updateView();
+        if(newState.hasGameDataChanged(oldState)) {
+            if(newState.getGameData() != null) {
+                updateView();
+            }
+        }
     }
 
 }

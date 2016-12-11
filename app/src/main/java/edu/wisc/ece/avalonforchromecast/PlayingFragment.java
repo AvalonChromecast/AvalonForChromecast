@@ -10,36 +10,23 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.os.Vibrator;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
@@ -48,7 +35,6 @@ import java.util.Random;
  * Based on https://github.com/playgameservices/8bitartist
  */
 public class PlayingFragment extends GameFragment{
-
 
     private static final String TAG = "LobbyFragment";
 
@@ -69,10 +55,24 @@ public class PlayingFragment extends GameFragment{
     private LinearLayout mExtraInfoContainer;
     private RadioGroup mTargetsContainer;
 
-    private static final int SELECTION_PHASE = 2;
-    private static final int VOTING_PHASE = 3;
-    private static final int MISSION_PHASE = 4;
-    private static final int ASSASSIN_PHASE = 5;
+    private final int SELECTION_PHASE = 2;
+    private final int VOTING_PHASE = 3;
+    private final int MISSION_PHASE = 4;
+    private final int ASSASSIN_PHASE = 5;
+
+    private final String MERLIN = "merlin";
+    private final String ASSASSIN = "assassin";
+    private final String PERCIVAL = "percival";
+    private final String MORDRED = "mordred";
+    private final String OBERON = "oberon";
+    private final String MORGANA = "morgana";
+
+    private final int MERLIN_INDEX = 0;
+    private final int ASSASSIN_INDEX = 1;
+    private final int PERCIVAL_INDEX = 2;
+    private final int MORDRED_INDEX = 3;
+    private final int OBERON_INDEX = 4;
+    private final int MORGANA_INDEX = 5;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -260,31 +260,94 @@ public class PlayingFragment extends GameFragment{
         mExtraInfoContainer.removeAllViews();
 
         boolean isEvil = loyalty.equals("evil");
-        boolean isMerlin = role.equals("merlin");
+        boolean isMerlin = role.equals(MERLIN);
+        boolean isPercival = role.equals(PERCIVAL);
+        boolean isMordred = role.equals(MORDRED);
+        boolean isOberon = role.equals(OBERON);
+        boolean isMorgana = role.equals(MORGANA);
 
-        if(isEvil || isMerlin){
-            TextView evilHeader = new TextView(getActivity());
+        boolean[] rolesArray= Arrays.copyOf(((MainActivity)getActivity()).getRolesArray(),6);
+
+        TextView header = new TextView(getActivity());
+        mExtraInfoContainer.addView(header);
+
+
+        if(isOberon){
+            header.setText("You can't see your fellow traitors!");
+        }
+
+        // display who traitors are
+        if((isEvil && !isOberon) || isMerlin){
             if(isEvil){
-                evilHeader.setText("Fellow traitors: ");
+                header.setText("Fellow traitors: ");
             }
             else if(isMerlin){
-                evilHeader.setText("Traitors: ");
+                header.setText("Traitors: ");
             }
-            mExtraInfoContainer.addView(evilHeader);
             for(int i=0; i<players.size(); i++){
                 String currPlayerId = players.get(i).getPlayerId();
                 String currPlayerLoyalty = "";
                 String currPlayerName = "";
+                String currPlayerRole = "";
                 try {
                     currPlayerLoyalty = players.get(i).getPlayerData().getString("loyalty");
                     currPlayerName = players.get(i).getPlayerData().getString("name");
+                    currPlayerRole = players.get(i).getPlayerData().getString("role");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
                 if(currPlayerLoyalty.equals("evil") && !myPlayerId.equals(currPlayerId)){
-                    TextView evils = new TextView(getActivity());
-                    evils.setText(currPlayerName);
-                    mExtraInfoContainer.addView(evils);
+                    if( !(isEvil && currPlayerRole.equals(OBERON)) || !(isMerlin && currPlayerRole.equals(MORDRED)) ) {
+                        TextView evils = new TextView(getActivity());
+                        evils.setText(currPlayerName);
+                        mExtraInfoContainer.addView(evils);
+                    }
+                }
+            }
+        }
+
+        //display who merlin is
+        if(isPercival){
+            boolean morganaExists = rolesArray[MORGANA_INDEX];
+            String merlinName = "";
+            try {
+                merlinName = gameData.getString(MERLIN);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            if(!morganaExists) {
+                header.setText("Merlin:");
+                TextView tv = new TextView(getActivity());
+                tv.setText(merlinName);
+                mExtraInfoContainer.addView(tv);
+            }else {
+                header.setText("Merlin or Morgana");
+                String morganaName = "";
+                try {
+                    morganaName = gameData.getString(MORGANA);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                Random rng = new Random();
+                boolean merlinFirst = rng.nextBoolean();
+
+                if(merlinFirst) {
+                    TextView tv1 = new TextView(getActivity());
+                    tv1.setText(merlinName);
+                    mExtraInfoContainer.addView(tv1);
+
+                    tv1 = new TextView(getActivity());
+                    tv1.setText(morganaName);
+                    mExtraInfoContainer.addView(tv1);
+                } else {
+                    TextView tv = new TextView(getActivity());
+                    tv.setText(morganaName);
+                    mExtraInfoContainer.addView(tv);
+
+                    tv = new TextView(getActivity());
+                    tv.setText(merlinName);
+                    mExtraInfoContainer.addView(tv);
                 }
             }
         }
@@ -433,12 +496,12 @@ public class PlayingFragment extends GameFragment{
             e.printStackTrace();
         }
 
-        if(myRole.equals("assassin")) {
+        if(myRole.equals(ASSASSIN)) {
             Vibrator v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
             // Vibrate for 250 milliseconds
             v.vibrate(250);
 
-            Toast.makeText(getActivity(), "Your are the assassin", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), "You are the assassin", Toast.LENGTH_LONG).show();
             //leader view
             //remove extra buttons when entering this phase again
             mMissionTeamSizeView.setVisibility(View.VISIBLE);
