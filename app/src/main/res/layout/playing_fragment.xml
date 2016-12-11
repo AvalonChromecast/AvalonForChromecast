@@ -110,12 +110,12 @@
             android:layout_height="wrap_content"
             android:orientation="vertical" >
 
-            <RadioGroup
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_below="@+id/missionTeamSizeView"
-                android:layout_centerHorizontal="true"
-                android:id="@+id/targetsContainer" />
+            <!--<RadioGroup-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:layout_below="@+id/missionTeamSizeView"-->
+                <!--android:layout_centerHorizontal="true"-->
+                <!--android:id="@+id/targetsContainer" />-->
         </LinearLayout>
     </ScrollView>
 

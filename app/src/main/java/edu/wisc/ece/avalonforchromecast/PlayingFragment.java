@@ -74,6 +74,8 @@ public class PlayingFragment extends GameFragment{
     private static final int MISSION_PHASE = 4;
     private static final int ASSASSIN_PHASE = 5;
 
+    private static final int TARGETS_CONTAINER_ID = 17;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -107,7 +109,7 @@ public class PlayingFragment extends GameFragment{
 
         mPlayerButtonsContainer = (LinearLayout) view.findViewById(R.id.playerButtonsContainer);
         mExtraInfoContainer = (LinearLayout) view.findViewById(R.id.extraInfoContainer);
-        mTargetsContainer = (RadioGroup) view.findViewById(R.id.targetsContainer);
+        //mTargetsContainer = (RadioGroup) view.findViewById(R.id.targetsContainer);
 
         mSubmitSelectionButton.setVisibility(View.GONE);
         mApproveSelectionButton.setVisibility(View.GONE);
@@ -447,8 +449,10 @@ public class PlayingFragment extends GameFragment{
             mMissionTeamSizeView.setVisibility(View.VISIBLE);
             mPlayerButtonsContainer.removeAllViews();
             mPlayerButtonsContainer.setVisibility(View.VISIBLE);
-            mTargetsContainer.setVisibility(View.VISIBLE);
             mSubmitSelectionButton.setVisibility(View.GONE);
+
+            mTargetsContainer = new RadioGroup(getActivity());
+            mPlayerButtonsContainer.addView(mTargetsContainer);
 
             //get list of playing players
             List<PlayerInfo> players = gameState.getPlayersInState(GameManagerClient.PLAYER_STATE_PLAYING);
@@ -471,6 +475,7 @@ public class PlayingFragment extends GameFragment{
                     playerButton.setText(playerName);
                     playerButton.setTag(player.getPlayerId());
                     mTargetsContainer.addView(playerButton);
+                    //targetsContainer.addView(playerButton);
                     Log.d(TAG, "current good person: " + playerName);
                 }
             }
