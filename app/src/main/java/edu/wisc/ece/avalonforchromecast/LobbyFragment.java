@@ -160,6 +160,7 @@ public class LobbyFragment extends GameFragment {
                         ((MainActivity) getActivity())
                                 .setPlayerState(gameManagerClient.getCurrentState().getPlayer(
                                         gameManagerResult.getPlayerId()).getPlayerState());
+                        ((MainActivity) getActivity()).setSetupLeader(false);
 
                     } else if(gameManagerResult.getStatus().getStatusCode() == GameManagerClient.STATUS_TOO_MANY_PLAYERS){
                         Toast.makeText(getActivity(), "Please have 5 to 10 players", Toast.LENGTH_SHORT).show();
@@ -235,7 +236,6 @@ public class LobbyFragment extends GameFragment {
         Log.d(TAG, "Enter lobbyfragment's onStateChanged");
         String playerId = ((MainActivity) getActivity()).getPlayerId();
         if(newState.hasPlayerStateChanged(playerId, oldState)){
-            Log.d(TAG, "Lobbyfragment's updatefragment");
             ((MainActivity) getActivity()).setPlayerState(newState.getPlayer(
                     playerId).getPlayerState());
         }
