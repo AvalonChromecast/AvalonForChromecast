@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         mGameOverFragment = new GameOverFragment();
 
         mSetupLeader = false;
+        mRolesArray = new boolean[6];
 
         updateFragments();
     }
