@@ -119,6 +119,7 @@ public class GameOverFragment extends GameFragment{
     @Override
     public void onStateChanged(GameManagerState newState,
                                GameManagerState oldState) {
+        ((MainActivity) getActivity()).updateFragments();
     }
 
     /**
