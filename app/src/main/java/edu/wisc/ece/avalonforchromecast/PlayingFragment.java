@@ -296,6 +296,7 @@ public class PlayingFragment extends GameFragment{
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                Log.d(TAG, "Current player's role: " + currPlayerRole);
                 if(currPlayerLoyalty.equals("evil") && !myPlayerId.equals(currPlayerId)){
                     if( !(isEvil && currPlayerRole.equals(OBERON)) || !(isMerlin && currPlayerRole.equals(MORDRED)) ) {
                         TextView evils = new TextView(getActivity());
