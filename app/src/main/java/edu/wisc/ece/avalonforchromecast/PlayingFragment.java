@@ -119,7 +119,6 @@ public class PlayingFragment extends GameFragment{
         mSubmitAssassinButton.setVisibility(View.GONE);
 
         mMissionTeamSizeView.setVisibility(View.GONE);
-        //mExtraInfoContainer.setVisibility(View.GONE);
 
         mShowHideButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -130,8 +129,7 @@ public class PlayingFragment extends GameFragment{
 
         mSubmitSelectionButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                onSubmitSelectionClicked();
+            public void onClick(View v) {onSubmitSelectionClicked();
             }
         });
         mApproveSelectionButton.setOnClickListener(new View.OnClickListener() {
@@ -450,6 +448,7 @@ public class PlayingFragment extends GameFragment{
             mPlayerButtonsContainer.removeAllViews();
             mPlayerButtonsContainer.setVisibility(View.VISIBLE);
             mSubmitSelectionButton.setVisibility(View.GONE);
+            mSubmitAssassinButton.setVisibility(View.VISIBLE);
 
             mTargetsContainer = new RadioGroup(getActivity());
             mPlayerButtonsContainer.addView(mTargetsContainer);
