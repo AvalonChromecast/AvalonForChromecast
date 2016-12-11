@@ -246,6 +246,7 @@ public class PlayingFragment extends GameFragment{
         String role = "";
         String myPlayerId = ((MainActivity) getActivity()).getPlayerId();
 
+        if(player.getPlayerData() == null) return;
         try {
             loyalty = player.getPlayerData().getString("loyalty");
             role = player.getPlayerData().getString("role");
@@ -298,7 +299,7 @@ public class PlayingFragment extends GameFragment{
                 }
                 Log.d(TAG, "Current player's role: " + currPlayerRole);
                 if(currPlayerLoyalty.equals("evil") && !myPlayerId.equals(currPlayerId)){
-                    if( !(isEvil && currPlayerRole.equals(OBERON)) || !(isMerlin && currPlayerRole.equals(MORDRED)) ) {
+                    if( !((isEvil && currPlayerRole.equals(OBERON)) ||(isMerlin && currPlayerRole.equals(MORDRED)))) {
                         TextView evils = new TextView(getActivity());
                         evils.setText(currPlayerName);
                         mExtraInfoContainer.addView(evils);
