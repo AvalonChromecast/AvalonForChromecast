@@ -646,6 +646,9 @@ public class PlayingFragment extends GameFragment{
         GameManagerState state = gameManagerClient.getCurrentState();
         JSONObject gameData = state.getGameData();
 
+        mPlayHintView.setText("Wait for everyone else to vote");
+        mPlayHintView.setVisibility(View.VISIBLE);
+
         //send an approve message
         JSONObject jsonMessage = new JSONObject();
         try {
@@ -663,11 +666,9 @@ public class PlayingFragment extends GameFragment{
                     Toast.makeText(getActivity(), "You voted to approve", Toast.LENGTH_SHORT).show();
                     mApproveSelectionButton.setVisibility(View.GONE);
                     mRejectSelectionButton.setVisibility(View.GONE);
-                    mPlayHintView.setText("Wait for everyone else to vote");
-                    mPlayHintView.setVisibility(View.VISIBLE);
                 }
                 else {
-
+                    mPlayHintView.setVisibility(View.GONE);
                 }
             }
         });
@@ -680,6 +681,9 @@ public class PlayingFragment extends GameFragment{
         final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
         GameManagerState state = gameManagerClient.getCurrentState();
         JSONObject gameData = state.getGameData();
+
+        mPlayHintView.setText("Wait for everyone else to vote");
+        mPlayHintView.setVisibility(View.VISIBLE);
 
         //send a reject message
         JSONObject jsonMessage = new JSONObject();
@@ -698,11 +702,9 @@ public class PlayingFragment extends GameFragment{
                     Toast.makeText(getActivity(), "You voted to reject", Toast.LENGTH_SHORT).show();
                     mApproveSelectionButton.setVisibility(View.GONE);
                     mRejectSelectionButton.setVisibility(View.GONE);
-                    mPlayHintView.setText("Wait for everyone else to vote");
-                    mPlayHintView.setVisibility(View.VISIBLE);
                 }
                 else {
-
+                    mPlayHintView.setVisibility(View.GONE);
                 }
             }
         });
@@ -715,6 +717,9 @@ public class PlayingFragment extends GameFragment{
         final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
         GameManagerState state = gameManagerClient.getCurrentState();
         JSONObject gameData = state.getGameData();
+
+        mPlayHintView.setText("Wait for others on the mission team to pass/fail the mission");
+        mPlayHintView.setVisibility(View.VISIBLE);
 
         //send a reject message
         JSONObject jsonMessage = new JSONObject();
@@ -733,11 +738,9 @@ public class PlayingFragment extends GameFragment{
                     Toast.makeText(getActivity(), "You passed the mission", Toast.LENGTH_SHORT).show();
                     mPassMissionButton.setVisibility(View.GONE);
                     mFailMissionButton.setVisibility(View.GONE);
-                    mPlayHintView.setText("Wait for others on the mission team to pass/fail the mission");
-                    mPlayHintView.setVisibility(View.VISIBLE);
                 }
                 else {
-
+                    mPlayHintView.setVisibility(View.GONE);
                 }
             }
         });
@@ -750,6 +753,9 @@ public class PlayingFragment extends GameFragment{
         final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
         GameManagerState state = gameManagerClient.getCurrentState();
         JSONObject gameData = state.getGameData();
+
+        mPlayHintView.setText("Wait for others on the mission team to pass/fail the mission");
+        mPlayHintView.setVisibility(View.VISIBLE);
 
         //send a reject message
         JSONObject jsonMessage = new JSONObject();
@@ -768,11 +774,9 @@ public class PlayingFragment extends GameFragment{
                     Toast.makeText(getActivity(), "You failed the mission", Toast.LENGTH_SHORT).show();
                     mPassMissionButton.setVisibility(View.GONE);
                     mFailMissionButton.setVisibility(View.GONE);
-                    mPlayHintView.setText("Wait for others on the mission team to pass/fail the mission");
-                    mPlayHintView.setVisibility(View.VISIBLE);
                 }
                 else {
-
+                    mPlayHintView.setVisibility(View.GONE);
                 }
             }
         });
