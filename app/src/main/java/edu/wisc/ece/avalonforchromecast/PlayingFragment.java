@@ -42,6 +42,7 @@ public class PlayingFragment extends GameFragment{
 
     private TextView mPlayerRoleTextView;
     private TextView mMissionTeamSizeView;
+    private TextView mPlayHintView;
 
     private Button mShowHideButton;
     private Button mSubmitSelectionButton;
@@ -96,6 +97,7 @@ public class PlayingFragment extends GameFragment{
 
         mPlayerRoleTextView = (TextView) view.findViewById(R.id.roleTextView);
         mMissionTeamSizeView = (TextView) view.findViewById(R.id.missionTeamSizeView);
+        mPlayHintView = (TextView) view.findViewById(R.id.playHintView);
 
         mShowHideButton = (Button) view.findViewById(R.id.showHideButton);
         mSubmitSelectionButton = (Button) view.findViewById(R.id.submitSelectionButton);
@@ -116,6 +118,7 @@ public class PlayingFragment extends GameFragment{
         mSubmitAssassinButton.setVisibility(View.GONE);
 
         mMissionTeamSizeView.setVisibility(View.GONE);
+        mPlayHintView.setVisibility(View.GONE);
 
         mShowHideButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -230,8 +233,6 @@ public class PlayingFragment extends GameFragment{
     /**
      * Called the first time selection phase is called. Initializes info on the screen, such as
      * loyalty, role, etc.
-     * @param gameState
-     * @param gameData
      */
     private void initialize(GameManagerState gameState, JSONObject gameData) {
         //display loyalty
@@ -335,13 +336,13 @@ public class PlayingFragment extends GameFragment{
                 boolean merlinFirst = rng.nextBoolean();
 
                 if(merlinFirst) {
-                    TextView tv1 = new TextView(getActivity());
-                    tv1.setText(merlinName);
-                    mExtraInfoContainer.addView(tv1);
+                    TextView tv = new TextView(getActivity());
+                    tv.setText(merlinName);
+                    mExtraInfoContainer.addView(tv);
 
-                    tv1 = new TextView(getActivity());
-                    tv1.setText(morganaName);
-                    mExtraInfoContainer.addView(tv1);
+                    tv = new TextView(getActivity());
+                    tv.setText(morganaName);
+                    mExtraInfoContainer.addView(tv);
                 } else {
                     TextView tv = new TextView(getActivity());
                     tv.setText(morganaName);
@@ -368,9 +369,7 @@ public class PlayingFragment extends GameFragment{
 
         try {
             String leaderId = gameData.getString("leader");
-            Log.d(TAG, "Leader id: " + leaderId);
             String playerId = ((MainActivity) getActivity()).getPlayerId();
-            Log.d(TAG, "Player id: " + playerId);
             if(leaderId.equals(playerId)) {
                 Vibrator v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
                 // Vibrate for 250 milliseconds
@@ -380,6 +379,7 @@ public class PlayingFragment extends GameFragment{
                 //leader view
                 //remove extra buttons when entering this phase again
                 mMissionTeamSizeView.setVisibility(View.VISIBLE);
+                mPlayHintView.setVisibility(View.GONE);
                 mPlayerButtonsContainer.removeAllViews();
                 mPlayerButtonsContainer.setVisibility(View.VISIBLE);
                 mSubmitSelectionButton.setVisibility(View.VISIBLE);
@@ -404,26 +404,22 @@ public class PlayingFragment extends GameFragment{
                     playerButton.setTag(player.getPlayerId());
                     mPlayerButtonsContainer.addView(playerButton);
                 }
-
                 int teamSize = 0;
                 try {
                     teamSize = gameData.getInt("missionTeamSize");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
                 mMissionTeamSizeView.setText("Select " + teamSize + " people for the mission");
             }
             else{
-                //do nothing
-                Toast.makeText(getActivity(), "You are not the leader", Toast.LENGTH_LONG).show();
+                mPlayHintView.setText("You are not the leader. Wait for the team leader selects mission team");
+                mPlayHintView.setVisibility(View.VISIBLE);
             }
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
-
 
 
     /**
@@ -431,6 +427,8 @@ public class PlayingFragment extends GameFragment{
      */
     public void votingPhase(GameManagerState gameState, JSONObject gameData){
         mMissionTeamSizeView.setVisibility(View.GONE);
+
+        mPlayHintView.setText("Selected mission team is shown on the TV. Make a decision with the two buttons");
 
         Vibrator v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
         // Vibrate for 250 milliseconds
@@ -469,14 +467,18 @@ public class PlayingFragment extends GameFragment{
                 // Vibrate for 250 milliseconds
                 v.vibrate(250);
 
-                Toast.makeText(getActivity(), "You are on the mission", Toast.LENGTH_LONG).show();
+                mPlayHintView.setVisibility(View.GONE);
+
+                Toast.makeText(getActivity(), "Choose whether or not pass the mission", Toast.LENGTH_LONG).show();
                 mPassMissionButton.setVisibility(View.VISIBLE);
                 PlayerInfo player = gameState.getPlayer(((MainActivity) getActivity()).getPlayerId());
                 String loyalty = player.getPlayerData().getString("loyalty");
-                if(loyalty.equals("evil"))
+                if(loyalty.equals("evil")) {
                     mFailMissionButton.setVisibility(View.VISIBLE);
-
+                }
             } else {
+                mPlayHintView.setText("You are not on the mission. Wait for the mission team make their selections");
+                mPlayHintView.setVisibility(View.VISIBLE);
                 Toast.makeText(getActivity(), "You are not on the mission", Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
@@ -484,6 +486,9 @@ public class PlayingFragment extends GameFragment{
         }
     }
 
+    /**
+     *Handle assassin phase.
+     */
     public void assassinPhase(GameManagerState gameState, JSONObject gameData){
         mApproveSelectionButton.setVisibility(View.GONE);
         mRejectSelectionButton.setVisibility(View.GONE);

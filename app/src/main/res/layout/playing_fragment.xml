@@ -47,6 +47,17 @@
         android:id="@+id/missionTeamSizeView"
         android:textColor="@android:color/white" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/extraInfoContainer"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="11dp"
+        android:id="@+id/playHintView"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        android:gravity="center" />
+
     <Button
         android:text="Submit"
         android:layout_width="wrap_content"
