@@ -177,24 +177,23 @@ public class PlayingFragment extends GameFragment{
             initialize(state, gameData);
             initialized = false;
         }
-
+        int gamePhase = 0;
         try {
-            int gamePhase = gameData.getInt("phase");
-            //Log.d(TAG, "game phase:" + gamePhase);
-            if(gamePhase == SELECTION_PHASE){
-                selectionPhase(state, gameData);
-            }
-            else if(gamePhase == VOTING_PHASE){
-                votingPhase(state, gameData);
-            }
-            else if(gamePhase == MISSION_PHASE){
-                missionPhase(state, gameData);
-            }
-            else if(gamePhase == ASSASSIN_PHASE){
-                assassinPhase(state, gameData);
-            }
+            gamePhase = gameData.getInt("phase");
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+        if(gamePhase == SELECTION_PHASE){
+            selectionPhase(state, gameData);
+        }
+        else if(gamePhase == VOTING_PHASE){
+            votingPhase(state, gameData);
+        }
+        else if(gamePhase == MISSION_PHASE){
+            missionPhase(state, gameData);
+        }
+        else if(gamePhase == ASSASSIN_PHASE){
+            assassinPhase(state, gameData);
         }
     }
 
@@ -207,24 +206,26 @@ public class PlayingFragment extends GameFragment{
         if(newState.hasGameDataChanged(oldState)){
             if(newState.getGameData() != null){
                 JSONObject gameData = newState.getGameData();
+                int gamePhase = -1;
                 try {
-                    int gamePhase = gameData.getInt("phase");
+                    gamePhase = gameData.getInt("phase");
                     Log.d(TAG, "game phase:" + gamePhase);
-                    if(gamePhase == SELECTION_PHASE){
-                        selectionPhase(newState, gameData);
-                    }
-                    else if(gamePhase == VOTING_PHASE){
-                        votingPhase(newState, gameData);
-                    }
-                    else if(gamePhase == MISSION_PHASE){
-                        missionPhase(newState, gameData);
-                    }
-                    else if(gamePhase == ASSASSIN_PHASE){
-                        assassinPhase(newState, gameData);
-                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                if(gamePhase == SELECTION_PHASE){
+                    selectionPhase(newState, gameData);
+                }
+                else if(gamePhase == VOTING_PHASE){
+                    votingPhase(newState, gameData);
+                }
+                else if(gamePhase == MISSION_PHASE){
+                    missionPhase(newState, gameData);
+                }
+                else if(gamePhase == ASSASSIN_PHASE){
+                    assassinPhase(newState, gameData);
+                }
+
                 ((MainActivity) getActivity()).updateFragments();
             }
         }
