@@ -2,38 +2,19 @@ package edu.wisc.ece.avalonforchromecast;
 
 import com.google.android.gms.cast.games.GameManagerClient;
 import com.google.android.gms.cast.games.GameManagerState;
-import com.google.android.gms.cast.games.PlayerInfo;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Vibrator;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.ToggleButton;
-
 
 /**
  * Fragment for drawing.
@@ -50,11 +31,6 @@ public class GameOverFragment extends GameFragment{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-
-//        GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
-//        GameManagerState gameState = gameManagerClient.getCurrentState();
-//        JSONObject gameData = gameState.getGameData();
-//        selectionPhase(gameState, gameData);
     }
 
     // This be the real onCreate function where we do lots of setup

@@ -8,7 +8,6 @@ import com.google.android.gms.common.api.ResultCallback;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -245,5 +244,4 @@ public class LobbyFragment extends GameFragment {
             }
         }
     }
-
 }

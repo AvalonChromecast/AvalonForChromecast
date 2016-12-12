@@ -79,11 +79,6 @@ public class PlayingFragment extends GameFragment{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-
-//        GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
-//        GameManagerState gameState = gameManagerClient.getCurrentState();
-//        JSONObject gameData = gameState.getGameData();
-//        selectionPhase(gameState, gameData);
     }
 
     // This be the real onCreate function where we do lots of setup
@@ -368,57 +363,58 @@ public class PlayingFragment extends GameFragment{
         mPassMissionButton.setVisibility(View.GONE);
         mFailMissionButton.setVisibility(View.GONE);
 
+        String leaderId = "";
         try {
-            String leaderId = gameData.getString("leader");
-            String playerId = ((MainActivity) getActivity()).getPlayerId();
-            if(leaderId.equals(playerId)) {
-                Vibrator v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
-                // Vibrate for 250 milliseconds
-                v.vibrate(250);
-
-                Toast.makeText(getActivity(), "You are the leader", Toast.LENGTH_LONG).show();
-                //leader view
-                //remove extra buttons when entering this phase again
-                mMissionTeamSizeView.setVisibility(View.VISIBLE);
-                mPlayHintView.setVisibility(View.GONE);
-                mPlayerButtonsContainer.removeAllViews();
-                mPlayerButtonsContainer.setVisibility(View.VISIBLE);
-                mSubmitSelectionButton.setVisibility(View.VISIBLE);
-
-                //get list of playing players
-                List<PlayerInfo> players = gameState.getPlayersInState(GameManagerClient.PLAYER_STATE_PLAYING);
-                //make radio button for each player
-                for (int i = 0; i < players.size(); i++) {
-                    PlayerInfo player = players.get(i);
-                    Log.d(TAG, "playerData: " + player.getPlayerData().toString());
-                    String playerName = "";
-                    try {
-                        playerName = player.getPlayerData().getString("name");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        Log.e(TAG, "Unable to access 'name' from PlayerInfo");
-                    }
-                    ToggleButton playerButton = new ToggleButton(getActivity());
-                    playerButton.setText(playerName);
-                    playerButton.setTextOn(playerName);
-                    playerButton.setTextOff(playerName);
-                    playerButton.setTag(player.getPlayerId());
-                    mPlayerButtonsContainer.addView(playerButton);
-                }
-                int teamSize = 0;
-                try {
-                    teamSize = gameData.getInt("missionTeamSize");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                mMissionTeamSizeView.setText("Select " + teamSize + " people for the mission");
-            }
-            else{
-                mPlayHintView.setText("You are not the leader. Wait for the team leader selects mission team");
-                mPlayHintView.setVisibility(View.VISIBLE);
-            }
+            leaderId = gameData.getString("leader");
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+        String playerId = ((MainActivity) getActivity()).getPlayerId();
+        if(leaderId.equals(playerId)) {
+            Vibrator v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+            // Vibrate for 250 milliseconds
+            v.vibrate(250);
+
+            Toast.makeText(getActivity(), "You are the leader", Toast.LENGTH_LONG).show();
+            //leader view
+            //remove extra buttons when entering this phase again
+            mMissionTeamSizeView.setVisibility(View.VISIBLE);
+            mPlayHintView.setVisibility(View.GONE);
+            mPlayerButtonsContainer.removeAllViews();
+            mPlayerButtonsContainer.setVisibility(View.VISIBLE);
+            mSubmitSelectionButton.setVisibility(View.VISIBLE);
+
+            //get list of playing players
+            List<PlayerInfo> players = gameState.getPlayersInState(GameManagerClient.PLAYER_STATE_PLAYING);
+            //make radio button for each player
+            for (int i = 0; i < players.size(); i++) {
+                PlayerInfo player = players.get(i);
+                Log.d(TAG, "playerData: " + player.getPlayerData().toString());
+                String playerName = "";
+                try {
+                    playerName = player.getPlayerData().getString("name");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Log.e(TAG, "Unable to access 'name' from PlayerInfo");
+                }
+                ToggleButton playerButton = new ToggleButton(getActivity());
+                playerButton.setText(playerName);
+                playerButton.setTextOn(playerName);
+                playerButton.setTextOff(playerName);
+                playerButton.setTag(player.getPlayerId());
+                mPlayerButtonsContainer.addView(playerButton);
+            }
+            int teamSize = 0;
+            try {
+                teamSize = gameData.getInt("missionTeamSize");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            mMissionTeamSizeView.setText("Select " + teamSize + " people for the mission");
+        }
+        else{
+            mPlayHintView.setText("You are not the leader. Wait for the team leader selects mission team");
+            mPlayHintView.setVisibility(View.VISIBLE);
         }
     }
 
@@ -452,11 +448,10 @@ public class PlayingFragment extends GameFragment{
         mApproveSelectionButton.setVisibility(View.GONE);
         mRejectSelectionButton.setVisibility(View.GONE);
         try {
-            String playerId = ((MainActivity) getActivity()).getPlayerId();
-
             JSONArray missionTeam = gameData.getJSONArray("missionTeam");
+
+            String playerId = ((MainActivity) getActivity()).getPlayerId();
             boolean onMission = false;
-            Log.d(TAG, "missionTeam: " + missionTeam.toString());
             for (int i = 0; i < missionTeam.length(); i++) {
                 if(playerId.equals(missionTeam.getString(i))){
                     onMission = true;
