@@ -2,6 +2,7 @@ package edu.wisc.ece.avalonforchromecast;
 
 import com.google.android.gms.cast.games.GameManagerClient;
 import com.google.android.gms.cast.games.GameManagerState;
+import com.google.android.gms.cast.games.PlayerInfo;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 
@@ -24,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A fragment displayed while the player is in the game lobby.
@@ -89,6 +91,11 @@ public class SetupFragment extends GameFragment {
         mMordredCheckBox.setVisibility(View.GONE);
         mMorganaCheckBox.setVisibility(View.GONE);
 
+        mAssassinCheckBox.setEnabled(false);
+        mPercivalCheckBox.setEnabled(false);
+        mMordredCheckBox.setEnabled(false);
+        mMorganaCheckBox.setEnabled(false);
+
         mMerlinCheckBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
@@ -148,18 +155,26 @@ public class SetupFragment extends GameFragment {
             mAssassinCheckBox.setVisibility(View.VISIBLE);
             mPercivalCheckBox.setVisibility(View.VISIBLE);
             mMordredCheckBox.setVisibility(View.VISIBLE);
+            mAssassinCheckBox.setEnabled(true);
+            mPercivalCheckBox.setEnabled(true);
+            mMordredCheckBox.setEnabled(true);
         } else {
             mAssassinCheckBox.setVisibility(View.GONE);
             mPercivalCheckBox.setVisibility(View.GONE);
             mMordredCheckBox.setVisibility(View.GONE);
+            mAssassinCheckBox.setEnabled(false);
+            mPercivalCheckBox.setEnabled(false);
+            mMordredCheckBox.setEnabled(false);
         }
     }
 
     private void onPercivalClicked() {
         if(mPercivalCheckBox.isChecked()){
             mMorganaCheckBox.setVisibility(View.VISIBLE);
+            mMorganaCheckBox.setEnabled(true);
         } else {
             mMorganaCheckBox.setVisibility(View.GONE);
+            mMorganaCheckBox.setEnabled(false);
         }
     }
 
@@ -193,9 +208,13 @@ public class SetupFragment extends GameFragment {
             }
             //check if numEvilChecked is too large
             GameManagerState state = gameManagerClient.getCurrentState();
-            JSONObject gameData = state.getGameData();
-            int maxEvilChecked;
-            //TODO: compare numEvilChecked to maxEvilChecked
+            List<PlayerInfo> players = state.getPlayersInState(GameManagerClient.PLAYER_STATE_PLAYING);
+            int maxEvilChecked = (int)Math.ceil(players.size() / 3);
+            Log.d(TAG, "numEvil, maxEvil: " + numEvilChecked + ", " + maxEvilChecked);
+            if(numEvilChecked > maxEvilChecked){
+                Toast.makeText(getActivity(), "You've selected too many evil roles", Toast.LENGTH_SHORT);
+                return;
+            }
             //update mRolesArray
             ((MainActivity)getActivity()).setRolesArray(rolesArray);
             // Send selected roles to the receiver
