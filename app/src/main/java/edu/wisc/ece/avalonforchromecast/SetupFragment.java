@@ -75,6 +75,8 @@ public class SetupFragment extends GameFragment {
         mOberonCheckBox = (CheckBox) view.findViewById(R.id.oberonCheckbox);
         mMorganaCheckBox = (CheckBox) view.findViewById(R.id.morganaCheckbox);
 
+        mSubmitButton = (Button) view.findViewById(R.id.submitButton);
+
         mMerlinCheckBox.setTag(MERLIN_INDEX);
         mAssassinCheckBox.setTag(ASSASSIN_INDEX);
         mPercivalCheckBox.setTag(PERCIVAL_INDEX);
@@ -82,8 +84,23 @@ public class SetupFragment extends GameFragment {
         mOberonCheckBox.setTag(OBERON_INDEX);
         mMorganaCheckBox.setTag(MORGANA_INDEX);
 
-        mSubmitButton = (Button) view.findViewById(R.id.submitButton);
+        mAssassinCheckBox.setVisibility(View.GONE);
+        mPercivalCheckBox.setVisibility(View.GONE);
+        mMordredCheckBox.setVisibility(View.GONE);
+        mMorganaCheckBox.setVisibility(View.GONE);
 
+        mMerlinCheckBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+                onMerlinClicked();
+            }
+        });
+        mPercivalCheckBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+                onPercivalClicked();
+            }
+        });
         mSubmitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -116,18 +133,33 @@ public class SetupFragment extends GameFragment {
             return;
         }
         GameManagerState state = gameManagerClient.getCurrentState();
-        JSONObject gameData = state.getGameData();
+        //JSONObject gameData = state.getGameData();
 
 
         if(!((MainActivity)getActivity()).getSetupLeader()){
             mTitleTextView.setText("Wait for setup leader to start the game.");
-            mMerlinCheckBox.setVisibility(View.GONE);
+            mCheckboxLayout.setVisibility(View.GONE);
+            mSubmitButton.setVisibility(View.GONE);
+        }
+    }
+
+    private void onMerlinClicked() {
+        if(mMerlinCheckBox.isChecked()){
+            mAssassinCheckBox.setVisibility(View.VISIBLE);
+            mPercivalCheckBox.setVisibility(View.VISIBLE);
+            mMordredCheckBox.setVisibility(View.VISIBLE);
+        } else {
             mAssassinCheckBox.setVisibility(View.GONE);
             mPercivalCheckBox.setVisibility(View.GONE);
-            mMorganaCheckBox.setVisibility(View.GONE);
-            mOberonCheckBox.setVisibility(View.GONE);
             mMordredCheckBox.setVisibility(View.GONE);
-            mSubmitButton.setVisibility(View.GONE);
+        }
+    }
+
+    private void onPercivalClicked() {
+        if(mPercivalCheckBox.isChecked()){
+            mMorganaCheckBox.setVisibility(View.VISIBLE);
+        } else {
+            mMorganaCheckBox.setVisibility(View.GONE);
         }
     }
 
@@ -144,14 +176,26 @@ public class SetupFragment extends GameFragment {
             ArrayList<View> roleButtons;
             roleButtons = mCheckboxLayout.getTouchables();
 
+            // keep track of number of evil roles that are checked
+            int numEvilChecked = 0;
             for(int i = 0; i < roleButtons.size(); i++){
                 CheckBox currRole = (CheckBox) roleButtons.get(i);
                 if(currRole.isChecked()){
                     String roleName = ((String)currRole.getText()).toLowerCase();
                     selectedRoles.add(roleName);
                     rolesArray[(int)currRole.getTag()] = true;
+                    //increment numEvilChecked
+                    if(roleName.equals("assassin") || roleName.equals("mordred") ||
+                            roleName.equals("oberon") || roleName.equals("morgana")){
+                        numEvilChecked++;
+                    }
                 }
             }
+            //check if numEvilChecked is too large
+            GameManagerState state = gameManagerClient.getCurrentState();
+            JSONObject gameData = state.getGameData();
+            int maxEvilChecked;
+            //TODO: compare numEvilChecked to maxEvilChecked
             //update mRolesArray
             ((MainActivity)getActivity()).setRolesArray(rolesArray);
             // Send selected roles to the receiver
