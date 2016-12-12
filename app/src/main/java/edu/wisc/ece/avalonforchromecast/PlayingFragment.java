@@ -36,7 +36,7 @@ import java.util.Random;
  */
 public class PlayingFragment extends GameFragment{
 
-    private static final String TAG = "LobbyFragment";
+    private static final String TAG = "PlayingFragment";
 
     private boolean initialized;
 

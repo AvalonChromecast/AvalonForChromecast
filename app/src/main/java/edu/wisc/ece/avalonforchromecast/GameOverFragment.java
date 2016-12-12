@@ -22,7 +22,7 @@ import android.widget.TextView;
  */
 public class GameOverFragment extends GameFragment{
 
-    private static final String TAG = "LobbyFragment";
+    private static final String TAG = "GameOverFragment";
 
     private TextView mGameOverView;
     private Button mLobbyButton;

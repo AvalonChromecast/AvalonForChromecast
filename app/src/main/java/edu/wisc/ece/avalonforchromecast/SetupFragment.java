@@ -122,7 +122,6 @@ public class SetupFragment extends GameFragment {
 
     @Override
     public void onDestroy(){
-        //sendPlayerQuitRequest();
         super.onDestroy();
     }
 
