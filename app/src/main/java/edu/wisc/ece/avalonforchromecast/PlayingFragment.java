@@ -427,8 +427,9 @@ public class PlayingFragment extends GameFragment{
      */
     public void votingPhase(GameManagerState gameState, JSONObject gameData){
         mMissionTeamSizeView.setVisibility(View.GONE);
+        mPlayHintView.setVisibility(View.GONE);
 
-        mPlayHintView.setText("Selected mission team is shown on the TV. Make a decision with the two buttons");
+        Toast.makeText(getActivity(), "Selected mission team is shown on the TV", Toast.LENGTH_LONG).show();
 
         Vibrator v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
         // Vibrate for 250 milliseconds
@@ -511,6 +512,8 @@ public class PlayingFragment extends GameFragment{
             Toast.makeText(getActivity(), "You are the assassin", Toast.LENGTH_LONG).show();
             //leader view
             //remove extra buttons when entering this phase again
+            mPlayHintView.setVisibility(View.GONE);
+
             mMissionTeamSizeView.setVisibility(View.VISIBLE);
             mPlayerButtonsContainer.removeAllViews();
             mPlayerButtonsContainer.setVisibility(View.VISIBLE);
@@ -546,8 +549,8 @@ public class PlayingFragment extends GameFragment{
             mMissionTeamSizeView.setText("Choose your assassination target.");
         }
         else{
-            //do nothing
-            Toast.makeText(getActivity(), "You are not the assassin", Toast.LENGTH_LONG).show();
+            mPlayHintView.setText("Wait for the assassin to choose the assassination target");
+            mPlayHintView.setVisibility(View.VISIBLE);
         }
     }
 
@@ -660,6 +663,8 @@ public class PlayingFragment extends GameFragment{
                     Toast.makeText(getActivity(), "You voted to approve", Toast.LENGTH_SHORT).show();
                     mApproveSelectionButton.setVisibility(View.GONE);
                     mRejectSelectionButton.setVisibility(View.GONE);
+                    mPlayHintView.setText("Wait for everyone else to vote");
+                    mPlayHintView.setVisibility(View.VISIBLE);
                 }
                 else {
 
@@ -693,6 +698,8 @@ public class PlayingFragment extends GameFragment{
                     Toast.makeText(getActivity(), "You voted to reject", Toast.LENGTH_SHORT).show();
                     mApproveSelectionButton.setVisibility(View.GONE);
                     mRejectSelectionButton.setVisibility(View.GONE);
+                    mPlayHintView.setText("Wait for everyone else to vote");
+                    mPlayHintView.setVisibility(View.VISIBLE);
                 }
                 else {
 
@@ -726,6 +733,8 @@ public class PlayingFragment extends GameFragment{
                     Toast.makeText(getActivity(), "You passed the mission", Toast.LENGTH_SHORT).show();
                     mPassMissionButton.setVisibility(View.GONE);
                     mFailMissionButton.setVisibility(View.GONE);
+                    mPlayHintView.setText("Wait for others on the mission team to pass/fail the mission");
+                    mPlayHintView.setVisibility(View.VISIBLE);
                 }
                 else {
 
@@ -759,6 +768,8 @@ public class PlayingFragment extends GameFragment{
                     Toast.makeText(getActivity(), "You failed the mission", Toast.LENGTH_SHORT).show();
                     mPassMissionButton.setVisibility(View.GONE);
                     mFailMissionButton.setVisibility(View.GONE);
+                    mPlayHintView.setText("Wait for others on the mission team to pass/fail the mission");
+                    mPlayHintView.setVisibility(View.VISIBLE);
                 }
                 else {
 
