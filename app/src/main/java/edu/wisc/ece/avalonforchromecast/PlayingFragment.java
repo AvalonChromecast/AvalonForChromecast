@@ -269,7 +269,7 @@ public class PlayingFragment extends GameFragment{
         boolean isOberon = role.equals(OBERON);
         boolean isMorgana = role.equals(MORGANA);
 
-        boolean[] rolesArray= Arrays.copyOf(((MainActivity)getActivity()).getRolesArray(),6);
+        //boolean[] rolesArray= Arrays.copyOf(((MainActivity)getActivity()).getRolesArray(),6);
 
         TextView header = new TextView(getActivity());
         mExtraInfoContainer.addView(header);
@@ -312,26 +312,21 @@ public class PlayingFragment extends GameFragment{
 
         //display who merlin is
         if(isPercival){
-            boolean morganaExists = rolesArray[MORGANA_INDEX];
+            String morganaName = "";
             String merlinName = "";
             try {
+                morganaName = gameData.getString(MORGANA);
                 merlinName = gameData.getString(MERLIN);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            if(!morganaExists) {
+            if(morganaName.equals("")) {
                 header.setText("Merlin:");
                 TextView tv = new TextView(getActivity());
                 tv.setText(merlinName);
                 mExtraInfoContainer.addView(tv);
             }else {
                 header.setText("Merlin or Morgana");
-                String morganaName = "";
-                try {
-                    morganaName = gameData.getString(MORGANA);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
 
                 Random rng = new Random();
                 boolean merlinFirst = rng.nextBoolean();

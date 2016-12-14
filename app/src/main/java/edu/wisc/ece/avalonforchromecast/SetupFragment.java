@@ -86,10 +86,6 @@ public class SetupFragment extends GameFragment {
         mOberonCheckBox.setTag(OBERON_INDEX);
         mMorganaCheckBox.setTag(MORGANA_INDEX);
 
-        mAssassinCheckBox.setVisibility(View.GONE);
-        mPercivalCheckBox.setVisibility(View.GONE);
-        mMordredCheckBox.setVisibility(View.GONE);
-        mMorganaCheckBox.setVisibility(View.GONE);
 
         mAssassinCheckBox.setEnabled(false);
         mPercivalCheckBox.setEnabled(false);
@@ -139,42 +135,58 @@ public class SetupFragment extends GameFragment {
             Log.d(TAG, "gameManagerClient in onStart is somehow null.");
             return;
         }
-        GameManagerState state = gameManagerClient.getCurrentState();
+        //GameManagerState state = gameManagerClient.getCurrentState();
         //JSONObject gameData = state.getGameData();
 
 
-        if(!((MainActivity)getActivity()).getSetupLeader()){
+        if(!getSetupLeader(gameManagerClient)){
             mTitleTextView.setText("Wait for setup leader to start the game.");
             mCheckboxLayout.setVisibility(View.GONE);
             mSubmitButton.setVisibility(View.GONE);
         }
     }
 
+    private boolean getSetupLeader(GameManagerClient gameManagerClient) {
+        GameManagerState state = gameManagerClient.getCurrentState();
+        JSONObject gameData = state.getGameData();
+
+        String setupLeaderID = "";
+        try {
+            setupLeaderID = gameData.getString("setupLeader");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        String playerID = ((MainActivity)getActivity()).getPlayerId();
+        Log.d(TAG,"playerID, setupLeaderID: " + playerID + ", " + setupLeaderID);
+        return playerID.equals(setupLeaderID);
+
+    }
+
     private void onMerlinClicked() {
         if(mMerlinCheckBox.isChecked()){
-            mAssassinCheckBox.setVisibility(View.VISIBLE);
-            mPercivalCheckBox.setVisibility(View.VISIBLE);
-            mMordredCheckBox.setVisibility(View.VISIBLE);
             mAssassinCheckBox.setEnabled(true);
             mPercivalCheckBox.setEnabled(true);
             mMordredCheckBox.setEnabled(true);
         } else {
-            mAssassinCheckBox.setVisibility(View.GONE);
-            mPercivalCheckBox.setVisibility(View.GONE);
-            mMordredCheckBox.setVisibility(View.GONE);
+            mAssassinCheckBox.setChecked(false);
+            mPercivalCheckBox.setChecked(false);
+            mMordredCheckBox.setChecked(false);
+            mMorganaCheckBox.setChecked(false);
             mAssassinCheckBox.setEnabled(false);
             mPercivalCheckBox.setEnabled(false);
             mMordredCheckBox.setEnabled(false);
+            mMorganaCheckBox.setEnabled(false);
         }
     }
 
     private void onPercivalClicked() {
         if(mPercivalCheckBox.isChecked()){
-            mMorganaCheckBox.setVisibility(View.VISIBLE);
             mMorganaCheckBox.setEnabled(true);
         } else {
-            mMorganaCheckBox.setVisibility(View.GONE);
+            mMorganaCheckBox.setChecked(false);
             mMorganaCheckBox.setEnabled(false);
+
         }
     }
 
@@ -216,7 +228,7 @@ public class SetupFragment extends GameFragment {
                 return;
             }
             //update mRolesArray
-            ((MainActivity)getActivity()).setRolesArray(rolesArray);
+            //((MainActivity)getActivity()).setRolesArray(rolesArray);
             // Send selected roles to the receiver
             JSONObject jsonMessage = new JSONObject();
             try {
