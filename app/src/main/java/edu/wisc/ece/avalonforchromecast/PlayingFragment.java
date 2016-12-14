@@ -427,8 +427,21 @@ public class PlayingFragment extends GameFragment{
         // Vibrate for 250 milliseconds
         v.vibrate(250);
 
-        mApproveSelectionButton.setVisibility(View.VISIBLE);
-        mRejectSelectionButton.setVisibility(View.VISIBLE);
+        PlayerInfo myPlayerInfo = gameState.getPlayer(((MainActivity) getActivity()).getPlayerId());
+        boolean hasVoted = false;
+        try {
+            hasVoted = myPlayerInfo.getPlayerData().getBoolean("hasVoted");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if(hasVoted){
+            mApproveSelectionButton.setVisibility(View.GONE);
+            mRejectSelectionButton.setVisibility(View.GONE);
+        }
+        else{
+            mApproveSelectionButton.setVisibility(View.VISIBLE);
+            mRejectSelectionButton.setVisibility(View.VISIBLE);
+        }
         mSubmitSelectionButton.setVisibility(View.GONE);
         mPlayerButtonsContainer.setVisibility(View.GONE);
     }
@@ -442,39 +455,60 @@ public class PlayingFragment extends GameFragment{
         //if you're on the mission team, display pass or fail buttons
         mApproveSelectionButton.setVisibility(View.GONE);
         mRejectSelectionButton.setVisibility(View.GONE);
+        JSONArray missionTeam = new JSONArray();
         try {
-            JSONArray missionTeam = gameData.getJSONArray("missionTeam");
+            missionTeam = gameData.getJSONArray("missionTeam");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
-            String playerId = ((MainActivity) getActivity()).getPlayerId();
-            boolean onMission = false;
-            for (int i = 0; i < missionTeam.length(); i++) {
-                if(playerId.equals(missionTeam.getString(i))){
-                    onMission = true;
-                    break;
-                }
+        String playerId = ((MainActivity) getActivity()).getPlayerId();
+        boolean onMission = false;
+        for (int i = 0; i < missionTeam.length(); i++) {
+            String currPlayerId = "";
+            try {
+                currPlayerId = missionTeam.getString(i);
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
+            if(playerId.equals(currPlayerId)){
+                onMission = true;
+                break;
+            }
+        }
 
-            if (onMission) {
-                Vibrator v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
-                // Vibrate for 250 milliseconds
-                v.vibrate(250);
+        if (onMission) {
+            Vibrator v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+            // Vibrate for 250 milliseconds
+            v.vibrate(250);
 
-                mPlayHintView.setVisibility(View.GONE);
+            mPlayHintView.setVisibility(View.GONE);
 
-                Toast.makeText(getActivity(), "Choose whether or not pass the mission", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), "Choose whether or not pass the mission", Toast.LENGTH_LONG).show();
+            PlayerInfo player = gameState.getPlayer(((MainActivity) getActivity()).getPlayerId());
+
+            String loyalty = "";
+            boolean hasMissioned = false;
+            try {
+                loyalty =  player.getPlayerData().getString("loyalty");
+                hasMissioned = player.getPlayerData().getBoolean("hasMissioned");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            if(hasMissioned){
+                mPassMissionButton.setVisibility(View.GONE);
+                mFailMissionButton.setVisibility(View.GONE);
+            }
+            else{
                 mPassMissionButton.setVisibility(View.VISIBLE);
-                PlayerInfo player = gameState.getPlayer(((MainActivity) getActivity()).getPlayerId());
-                String loyalty = player.getPlayerData().getString("loyalty");
                 if(loyalty.equals("evil")) {
                     mFailMissionButton.setVisibility(View.VISIBLE);
                 }
-            } else {
-                mPlayHintView.setText("You are not on the mission. Wait for the mission team make their selections");
-                mPlayHintView.setVisibility(View.VISIBLE);
-                Toast.makeText(getActivity(), "You are not on the mission", Toast.LENGTH_LONG).show();
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
+        } else {
+            mPlayHintView.setText("You are not on the mission. Wait for the mission team make their selections");
+            mPlayHintView.setVisibility(View.VISIBLE);
+            Toast.makeText(getActivity(), "You are not on the mission", Toast.LENGTH_LONG).show();
         }
     }
 
