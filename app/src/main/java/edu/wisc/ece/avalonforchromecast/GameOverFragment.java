@@ -105,7 +105,9 @@ public class GameOverFragment extends GameFragment{
                                GameManagerState oldState) {
         if(newState.hasGameDataChanged(oldState)) {
             if(newState.getGameData() != null) {
-                ((MainActivity) mActivity).updateFragments();
+//                ((MainActivity) mActivity).updateFragments();
+                ((MainActivity) mActivity).setPlayerState(newState.getPlayer(
+                        ((MainActivity) mActivity).getPlayerId()).getPlayerState());
             }
         }
     }
