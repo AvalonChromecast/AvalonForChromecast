@@ -8,6 +8,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,6 +27,7 @@ public class GameOverFragment extends GameFragment{
 
     private TextView mGameOverView;
     private Button mLobbyButton;
+    private Activity mActivity;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -54,6 +56,12 @@ public class GameOverFragment extends GameFragment{
     }
 
     @Override
+    public void onAttach(Activity activity){
+        super.onAttach(activity);
+        mActivity = activity;
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
 
@@ -72,7 +80,7 @@ public class GameOverFragment extends GameFragment{
             e.printStackTrace();
         }
 
-        String loyalty = ((MainActivity) getActivity()).getLoyalty();
+        String loyalty = ((MainActivity) mActivity).getLoyalty();
         boolean isGood = false;
         if(loyalty.equals("good")){
             isGood = true;
@@ -97,7 +105,7 @@ public class GameOverFragment extends GameFragment{
                                GameManagerState oldState) {
         if(newState.hasGameDataChanged(oldState)) {
             if(newState.getGameData() != null) {
-                ((MainActivity) getActivity()).updateFragments();
+                ((MainActivity) mActivity).updateFragments();
             }
         }
     }
@@ -123,7 +131,7 @@ public class GameOverFragment extends GameFragment{
             @Override
             public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
                 if (gameManagerResult.getStatus().isSuccess()) {
-                    ((MainActivity) getActivity()).setPlayerState(gameManagerClient.getCurrentState().getPlayer(
+                    ((MainActivity) mActivity).setPlayerState(gameManagerClient.getCurrentState().getPlayer(
                             gameManagerResult.getPlayerId()).getPlayerState());
                 }
                 else {

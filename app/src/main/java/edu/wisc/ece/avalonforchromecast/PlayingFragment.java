@@ -10,6 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Vibrator;
@@ -74,6 +75,8 @@ public class PlayingFragment extends GameFragment{
     private final int MORDRED_INDEX = 3;
     private final int OBERON_INDEX = 4;
     private final int MORGANA_INDEX = 5;
+
+    private Activity mActivity;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -157,6 +160,12 @@ public class PlayingFragment extends GameFragment{
     }
 
     @Override
+    public void onAttach(Activity activity){
+        super.onAttach(activity);
+        mActivity = activity;
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
 
@@ -221,7 +230,7 @@ public class PlayingFragment extends GameFragment{
                     assassinPhase(newState, gameData);
                 }
 
-                ((MainActivity) getActivity()).updateFragments();
+                ((MainActivity) mActivity).updateFragments();
             }
         }
     }
@@ -232,7 +241,7 @@ public class PlayingFragment extends GameFragment{
      */
     private void initialize(GameManagerState gameState, JSONObject gameData) {
         //display loyalty
-        PlayerInfo player = gameState.getPlayer(((MainActivity) getActivity()).getPlayerId());
+        PlayerInfo player = gameState.getPlayer(((MainActivity) mActivity).getPlayerId());
         if(player == null){
             Log.d(TAG, "player is somehow null in initialize()");
             return;
@@ -241,7 +250,7 @@ public class PlayingFragment extends GameFragment{
 
         String loyalty = "";
         String role = "";
-        String myPlayerId = ((MainActivity) getActivity()).getPlayerId();
+        String myPlayerId = ((MainActivity) mActivity).getPlayerId();
 
         if(player.getPlayerData() == null) return;
         try {
@@ -251,7 +260,7 @@ public class PlayingFragment extends GameFragment{
             e.printStackTrace();
         }
 
-        ((MainActivity) getActivity()).setLoyalty(loyalty);
+        ((MainActivity) mActivity).setLoyalty(loyalty);
 
         mPlayerRoleTextView.setText(loyalty + " - " + role);
         mMissionTeamSizeView.setText("");
@@ -264,9 +273,9 @@ public class PlayingFragment extends GameFragment{
         boolean isOberon = role.equals(OBERON);
         boolean isMorgana = role.equals(MORGANA);
 
-        //boolean[] rolesArray= Arrays.copyOf(((MainActivity)getActivity()).getRolesArray(),6);
+        //boolean[] rolesArray= Arrays.copyOf(((MainActivity)mActivity).getRolesArray(),6);
 
-        TextView header = new TextView(getActivity());
+        TextView header = new TextView(mActivity);
         mExtraInfoContainer.addView(header);
 
 
@@ -297,7 +306,7 @@ public class PlayingFragment extends GameFragment{
                 Log.d(TAG, "Current player's role: " + currPlayerRole);
                 if(currPlayerLoyalty.equals("evil") && !myPlayerId.equals(currPlayerId)){
                     if( !((isEvil && currPlayerRole.equals(OBERON)) ||(isMerlin && currPlayerRole.equals(MORDRED)))) {
-                        TextView evils = new TextView(getActivity());
+                        TextView evils = new TextView(mActivity);
                         evils.setText(currPlayerName);
                         mExtraInfoContainer.addView(evils);
                     }
@@ -317,7 +326,7 @@ public class PlayingFragment extends GameFragment{
             }
             if(morganaName.equals("")) {
                 header.setText("Merlin:");
-                TextView tv = new TextView(getActivity());
+                TextView tv = new TextView(mActivity);
                 tv.setText(merlinName);
                 mExtraInfoContainer.addView(tv);
             }else {
@@ -327,19 +336,19 @@ public class PlayingFragment extends GameFragment{
                 boolean merlinFirst = rng.nextBoolean();
 
                 if(merlinFirst) {
-                    TextView tv = new TextView(getActivity());
+                    TextView tv = new TextView(mActivity);
                     tv.setText(merlinName);
                     mExtraInfoContainer.addView(tv);
 
-                    tv = new TextView(getActivity());
+                    tv = new TextView(mActivity);
                     tv.setText(morganaName);
                     mExtraInfoContainer.addView(tv);
                 } else {
-                    TextView tv = new TextView(getActivity());
+                    TextView tv = new TextView(mActivity);
                     tv.setText(morganaName);
                     mExtraInfoContainer.addView(tv);
 
-                    tv = new TextView(getActivity());
+                    tv = new TextView(mActivity);
                     tv.setText(merlinName);
                     mExtraInfoContainer.addView(tv);
                 }
@@ -364,13 +373,13 @@ public class PlayingFragment extends GameFragment{
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        String playerId = ((MainActivity) getActivity()).getPlayerId();
+        String playerId = ((MainActivity) mActivity).getPlayerId();
         if(leaderId.equals(playerId)) {
-            Vibrator v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+            Vibrator v = (Vibrator) mActivity.getSystemService(Context.VIBRATOR_SERVICE);
             // Vibrate for 250 milliseconds
             v.vibrate(250);
 
-            Toast.makeText(getActivity(), "You are the leader", Toast.LENGTH_LONG).show();
+            Toast.makeText(mActivity, "You are the leader", Toast.LENGTH_LONG).show();
             //leader view
             //remove extra buttons when entering this phase again
             mMissionTeamSizeView.setVisibility(View.VISIBLE);
@@ -392,7 +401,7 @@ public class PlayingFragment extends GameFragment{
                     e.printStackTrace();
                     Log.e(TAG, "Unable to access 'name' from PlayerInfo");
                 }
-                ToggleButton playerButton = new ToggleButton(getActivity());
+                ToggleButton playerButton = new ToggleButton(mActivity);
                 playerButton.setText(playerName);
                 playerButton.setTextOn(playerName);
                 playerButton.setTextOff(playerName);
@@ -421,13 +430,13 @@ public class PlayingFragment extends GameFragment{
         mMissionTeamSizeView.setVisibility(View.GONE);
         mPlayHintView.setVisibility(View.GONE);
 
-        Toast.makeText(getActivity(), "Selected mission team is shown on the TV", Toast.LENGTH_LONG).show();
+        Toast.makeText(mActivity, "Selected mission team is shown on the TV", Toast.LENGTH_LONG).show();
 
-        Vibrator v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+        Vibrator v = (Vibrator) mActivity.getSystemService(Context.VIBRATOR_SERVICE);
         // Vibrate for 250 milliseconds
         v.vibrate(250);
 
-        PlayerInfo myPlayerInfo = gameState.getPlayer(((MainActivity) getActivity()).getPlayerId());
+        PlayerInfo myPlayerInfo = gameState.getPlayer(((MainActivity) mActivity).getPlayerId());
         boolean hasVoted = false;
         try {
             hasVoted = myPlayerInfo.getPlayerData().getBoolean("hasVoted");
@@ -462,7 +471,7 @@ public class PlayingFragment extends GameFragment{
             e.printStackTrace();
         }
 
-        String playerId = ((MainActivity) getActivity()).getPlayerId();
+        String playerId = ((MainActivity) mActivity).getPlayerId();
         boolean onMission = false;
         for (int i = 0; i < missionTeam.length(); i++) {
             String currPlayerId = "";
@@ -478,14 +487,14 @@ public class PlayingFragment extends GameFragment{
         }
 
         if (onMission) {
-            Vibrator v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+            Vibrator v = (Vibrator) mActivity.getSystemService(Context.VIBRATOR_SERVICE);
             // Vibrate for 250 milliseconds
             v.vibrate(250);
 
             mPlayHintView.setVisibility(View.GONE);
 
-            Toast.makeText(getActivity(), "Choose whether or not pass the mission", Toast.LENGTH_LONG).show();
-            PlayerInfo player = gameState.getPlayer(((MainActivity) getActivity()).getPlayerId());
+            Toast.makeText(mActivity, "Choose whether or not pass the mission", Toast.LENGTH_LONG).show();
+            PlayerInfo player = gameState.getPlayer(((MainActivity) mActivity).getPlayerId());
 
             String loyalty = "";
             boolean hasMissioned = false;
@@ -508,7 +517,7 @@ public class PlayingFragment extends GameFragment{
         } else {
             mPlayHintView.setText("You are not on the mission. Wait for the mission team make their selections");
             mPlayHintView.setVisibility(View.VISIBLE);
-            Toast.makeText(getActivity(), "You are not on the mission", Toast.LENGTH_LONG).show();
+            Toast.makeText(mActivity, "You are not on the mission", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -521,7 +530,7 @@ public class PlayingFragment extends GameFragment{
         mPassMissionButton.setVisibility(View.GONE);
         mFailMissionButton.setVisibility(View.GONE);
 
-        PlayerInfo myPlayerInfo = gameState.getPlayer(((MainActivity) getActivity()).getPlayerId());
+        PlayerInfo myPlayerInfo = gameState.getPlayer(((MainActivity) mActivity).getPlayerId());
         String myRole = "";
         try {
             myRole = myPlayerInfo.getPlayerData().getString("role");
@@ -530,11 +539,11 @@ public class PlayingFragment extends GameFragment{
         }
 
         if(myRole.equals(ASSASSIN)) {
-            Vibrator v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+            Vibrator v = (Vibrator) mActivity.getSystemService(Context.VIBRATOR_SERVICE);
             // Vibrate for 250 milliseconds
             v.vibrate(250);
 
-            Toast.makeText(getActivity(), "You are the assassin", Toast.LENGTH_LONG).show();
+            Toast.makeText(mActivity, "You are the assassin", Toast.LENGTH_LONG).show();
             //leader view
             //remove extra buttons when entering this phase again
             mPlayHintView.setVisibility(View.GONE);
@@ -545,7 +554,7 @@ public class PlayingFragment extends GameFragment{
             mSubmitSelectionButton.setVisibility(View.GONE);
             mSubmitAssassinButton.setVisibility(View.VISIBLE);
 
-            mTargetsContainer = new RadioGroup(getActivity());
+            mTargetsContainer = new RadioGroup(mActivity);
             mPlayerButtonsContainer.addView(mTargetsContainer);
 
             //get list of playing players
@@ -564,7 +573,7 @@ public class PlayingFragment extends GameFragment{
                     Log.e(TAG, "Unable to access 'name' from PlayerInfo");
                 }
                 if(playerLoyalty.equals("good")) {
-                    RadioButton playerButton = new RadioButton(getActivity());
+                    RadioButton playerButton = new RadioButton(mActivity);
                     playerButton.setText(playerName);
                     playerButton.setTag(player.getPlayerId());
                     mTargetsContainer.addView(playerButton);
@@ -627,10 +636,10 @@ public class PlayingFragment extends GameFragment{
         }
 
         if(selectedPlayers.size() < teamSize){
-            Toast.makeText(getActivity(), "You selected too few players", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mActivity, "You selected too few players", Toast.LENGTH_SHORT).show();
             return;
         } else if(selectedPlayers.size() > teamSize){
-            Toast.makeText(getActivity(), "You selected too many players", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mActivity, "You selected too many players", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -653,7 +662,7 @@ public class PlayingFragment extends GameFragment{
             @Override
             public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
                 if (gameManagerResult.getStatus().isSuccess()) {
-                    Toast.makeText(getActivity(), "You submitted a selection", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mActivity, "You submitted a selection", Toast.LENGTH_SHORT).show();
                 }
                 else {
 
@@ -688,7 +697,7 @@ public class PlayingFragment extends GameFragment{
             @Override
             public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
                 if (gameManagerResult.getStatus().isSuccess()) {
-                    Toast.makeText(getActivity(), "You voted to approve", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mActivity, "You voted to approve", Toast.LENGTH_SHORT).show();
                     mApproveSelectionButton.setVisibility(View.GONE);
                     mRejectSelectionButton.setVisibility(View.GONE);
                 }
@@ -724,7 +733,7 @@ public class PlayingFragment extends GameFragment{
             @Override
             public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
                 if (gameManagerResult.getStatus().isSuccess()) {
-                    Toast.makeText(getActivity(), "You voted to reject", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mActivity, "You voted to reject", Toast.LENGTH_SHORT).show();
                     mApproveSelectionButton.setVisibility(View.GONE);
                     mRejectSelectionButton.setVisibility(View.GONE);
                 }
@@ -760,7 +769,7 @@ public class PlayingFragment extends GameFragment{
             @Override
             public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
                 if (gameManagerResult.getStatus().isSuccess()) {
-                    Toast.makeText(getActivity(), "You passed the mission", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mActivity, "You passed the mission", Toast.LENGTH_SHORT).show();
                     mPassMissionButton.setVisibility(View.GONE);
                     mFailMissionButton.setVisibility(View.GONE);
                 }
@@ -796,7 +805,7 @@ public class PlayingFragment extends GameFragment{
             @Override
             public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
                 if (gameManagerResult.getStatus().isSuccess()) {
-                    Toast.makeText(getActivity(), "You failed the mission", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mActivity, "You failed the mission", Toast.LENGTH_SHORT).show();
                     mPassMissionButton.setVisibility(View.GONE);
                     mFailMissionButton.setVisibility(View.GONE);
                 }
@@ -815,7 +824,7 @@ public class PlayingFragment extends GameFragment{
         GameManagerState state = gameManagerClient.getCurrentState();
         JSONObject gameData = state.getGameData();
 
-        RadioButton targetButton = (RadioButton) getActivity().
+        RadioButton targetButton = (RadioButton) mActivity.
                 findViewById(mTargetsContainer.getCheckedRadioButtonId());
 
         String targetId = (String) targetButton.getTag();
@@ -833,7 +842,7 @@ public class PlayingFragment extends GameFragment{
             @Override
             public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
                 if (gameManagerResult.getStatus().isSuccess()) {
-                    Toast.makeText(getActivity(), "You assassinate someone", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mActivity, "You assassinate someone", Toast.LENGTH_SHORT).show();
                 }
                 else {
 

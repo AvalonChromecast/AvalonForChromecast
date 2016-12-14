@@ -10,6 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -50,7 +51,7 @@ public class SetupFragment extends GameFragment {
     private final int OBERON_INDEX = 4;
     private final int MORGANA_INDEX = 5;
 
-
+    private Activity mActivity;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -112,6 +113,12 @@ public class SetupFragment extends GameFragment {
     }
 
     @Override
+    public void onAttach(Activity activity){
+        super.onAttach(activity);
+        mActivity = activity;
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
     }
@@ -153,7 +160,7 @@ public class SetupFragment extends GameFragment {
             e.printStackTrace();
         }
 
-        String playerID = ((MainActivity)getActivity()).getPlayerId();
+        String playerID = ((MainActivity)mActivity).getPlayerId();
         Log.d(TAG,"playerID, setupLeaderID: " + playerID + ", " + setupLeaderID);
         return playerID.equals(setupLeaderID);
 
@@ -220,11 +227,11 @@ public class SetupFragment extends GameFragment {
             int maxEvilChecked = (int)Math.ceil(players.size() / 3);
             Log.d(TAG, "numEvil, maxEvil: " + numEvilChecked + ", " + maxEvilChecked);
             if(numEvilChecked > maxEvilChecked){
-                Toast.makeText(getActivity(), "You've selected too many evil roles", Toast.LENGTH_SHORT);
+                Toast.makeText(mActivity, "You've selected too many evil roles", Toast.LENGTH_SHORT).show();
                 return;
             }
             //update mRolesArray
-            //((MainActivity)getActivity()).setRolesArray(rolesArray);
+            //((MainActivity)mActivity).setRolesArray(rolesArray);
             // Send selected roles to the receiver
             JSONObject jsonMessage = new JSONObject();
             try {
@@ -239,14 +246,15 @@ public class SetupFragment extends GameFragment {
                 @Override
                 public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
                     if (gameManagerResult.getStatus().isSuccess()) {
-                        Toast.makeText(getActivity(), "Start Game was successful", Toast.LENGTH_SHORT);
-                        ((MainActivity) getActivity())
+                        Toast.makeText(mActivity, "Start Game was successful", Toast.LENGTH_SHORT).show();
+                        ((MainActivity) mActivity)
                                 .setPlayerState(gameManagerClient.getCurrentState().getPlayer(
                                         gameManagerResult.getPlayerId()).getPlayerState());
 
                     } else {
+                        Toast.makeText(mActivity, "Something wrong????", Toast.LENGTH_SHORT).show();
                         mCastConnectionManager.disconnectFromReceiver(false);
-                        Utils.showErrorDialog(getActivity(),
+                        Utils.showErrorDialog(mActivity,
                                 gameManagerResult.getStatus().getStatusMessage());
                     }
                 }

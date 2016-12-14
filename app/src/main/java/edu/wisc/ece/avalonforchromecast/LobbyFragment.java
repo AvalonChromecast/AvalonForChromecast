@@ -8,6 +8,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,6 +29,8 @@ public class LobbyFragment extends GameFragment {
     private EditText mNameEditText;
     private Button mJoinStartButton;
     private ProgressBar mSpinner;
+
+    private Activity mActivity;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -55,6 +58,12 @@ public class LobbyFragment extends GameFragment {
     }
 
     @Override
+    public void onAttach(Activity activity){
+        super.onAttach(activity);
+        mActivity = activity;
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         updateView();
@@ -73,14 +82,14 @@ public class LobbyFragment extends GameFragment {
         GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
         GameManagerState state = gameManagerClient.getCurrentState();
 
-        int playerState = ((MainActivity) getActivity()).getPlayerState();
+        int playerState = ((MainActivity) mActivity).getPlayerState();
         if (playerState == GameManagerClient.PLAYER_STATE_AVAILABLE) {
             //if lobby state is closed
             if(state.getLobbyState() == GameManagerClient.LOBBY_STATE_CLOSED){
-                Toast.makeText(getActivity(), "Please wait until the game is finished", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mActivity, "Please wait until the game is finished", Toast.LENGTH_SHORT).show();
             }
             else{
-                ((MainActivity) getActivity()).setPlayerName(mNameEditText.getText().toString());
+                ((MainActivity) mActivity).setPlayerName(mNameEditText.getText().toString());
                 sendPlayerReadyRequest();
             }
         } else if (playerState == GameManagerClient.PLAYER_STATE_READY) {
@@ -118,12 +127,12 @@ public class LobbyFragment extends GameFragment {
                         }
                         Log.d(TAG, "sent updatePlayerList signal");
                         gameManagerClient.sendGameMessage(jsonMessage2);
-                        ((MainActivity) getActivity())
+                        ((MainActivity) mActivity)
                                 .setPlayerState(gameManagerClient.getCurrentState().getPlayer(
                                         gameManagerResult.getPlayerId()).getPlayerState());
                     } else {
                         mCastConnectionManager.disconnectFromReceiver(false);
-                        Utils.showErrorDialog(getActivity(),
+                        Utils.showErrorDialog(mActivity,
                                 gameManagerResult.getStatus().getStatusMessage());
                     }
                     updateView();
@@ -140,7 +149,7 @@ public class LobbyFragment extends GameFragment {
         final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
         if (mCastConnectionManager.isConnectedToReceiver()) {
 
-            ((MainActivity) getActivity()).setSetupLeader(true);
+            ((MainActivity) mActivity).setSetupLeader(true);
             // Send player name to the receiver
             JSONObject jsonMessage = new JSONObject();
             try {
@@ -155,20 +164,20 @@ public class LobbyFragment extends GameFragment {
                 @Override
                 public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
                     if (gameManagerResult.getStatus().isSuccess()) {
-                        Toast.makeText(getActivity(), "Start Game success, you're setup leader", Toast.LENGTH_SHORT).show();
-                        ((MainActivity) getActivity())
+                        Toast.makeText(mActivity, "Start Game success, you're setup leader", Toast.LENGTH_SHORT).show();
+                        ((MainActivity) mActivity)
                                 .setPlayerState(gameManagerClient.getCurrentState().getPlayer(
                                         gameManagerResult.getPlayerId()).getPlayerState());
-                        ((MainActivity) getActivity()).setSetupLeader(false);
+                        ((MainActivity) mActivity).setSetupLeader(false);
 
                     } else if(gameManagerResult.getStatus().getStatusCode() == GameManagerClient.STATUS_TOO_MANY_PLAYERS){
-                        Toast.makeText(getActivity(), "Please have 5 to 10 players", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mActivity, "Please have 5 to 10 players", Toast.LENGTH_SHORT).show();
                     }
                     else {
 
-                        ((MainActivity) getActivity()).setSetupLeader(false);
+                        ((MainActivity) mActivity).setSetupLeader(false);
                         mCastConnectionManager.disconnectFromReceiver(false);
-                        Utils.showErrorDialog(getActivity(),
+                        Utils.showErrorDialog(mActivity,
                                 gameManagerResult.getStatus().getStatusMessage());
                     }
                     updateView();
@@ -183,10 +192,10 @@ public class LobbyFragment extends GameFragment {
      * the lobby and then start the game.
      */
     private void updateView() {
-        if (((MainActivity) getActivity()).getPlayerName() == null) {
+        if (((MainActivity) mActivity).getPlayerName() == null) {
             mNameEditText.setText("");
         }
-        int playerState = ((MainActivity) getActivity()).getPlayerState();
+        int playerState = ((MainActivity) mActivity).getPlayerState();
         GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
         if (mCastConnectionManager.isConnectedToReceiver()) {
             GameManagerState gameManagerState = gameManagerClient.getCurrentState();
@@ -208,9 +217,9 @@ public class LobbyFragment extends GameFragment {
     @Override
     public void onStateChanged(GameManagerState newState, GameManagerState oldState){
         Log.d(TAG, "Enter lobbyfragment's onStateChanged");
-        String playerId = ((MainActivity) getActivity()).getPlayerId();
+        String playerId = ((MainActivity) mActivity).getPlayerId();
         if(newState.hasPlayerStateChanged(playerId, oldState)){
-            ((MainActivity) getActivity()).setPlayerState(newState.getPlayer(
+            ((MainActivity) mActivity).setPlayerState(newState.getPlayer(
                     playerId).getPlayerState());
         }
         if(newState.hasGameDataChanged(oldState)) {

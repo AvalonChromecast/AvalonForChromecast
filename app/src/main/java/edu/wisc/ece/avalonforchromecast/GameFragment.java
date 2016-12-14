@@ -6,6 +6,7 @@ import com.google.android.gms.cast.games.GameManagerState;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,6 +21,8 @@ public class GameFragment extends Fragment implements Observer, GameManagerClien
 
     private static final String TAG = "GameFragment";
 
+    private Activity mActivity;
+
     protected CastConnectionManager mCastConnectionManager;
 
     @Override
@@ -32,11 +35,17 @@ public class GameFragment extends Fragment implements Observer, GameManagerClien
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mCastConnectionManager = ((MainActivity) getActivity()).getCastConnectionManager();
+        mCastConnectionManager = ((MainActivity) mActivity).getCastConnectionManager();
         mCastConnectionManager.addObserver(this);
         if (mCastConnectionManager.getGameManagerClient() != null) {
             mCastConnectionManager.getGameManagerClient().setListener(this);
         }
+    }
+
+    @Override
+    public void onAttach(Activity activity){
+        super.onAttach(activity);
+        mActivity = activity;
     }
 
     @Override
@@ -59,9 +68,9 @@ public class GameFragment extends Fragment implements Observer, GameManagerClien
     @Override
     public void onStateChanged(GameManagerState newState,
             GameManagerState oldState) {
-        ((MainActivity) getActivity())
+        ((MainActivity) mActivity)
                 .setPlayerState(newState.getPlayer(
-                        ((MainActivity) getActivity()).getPlayerId()).getPlayerState());
+                        ((MainActivity) mActivity).getPlayerId()).getPlayerState());
     }
 
     /**
