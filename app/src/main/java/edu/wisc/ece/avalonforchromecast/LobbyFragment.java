@@ -8,7 +8,6 @@ import com.google.android.gms.common.api.ResultCallback;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -180,31 +179,6 @@ public class LobbyFragment extends GameFragment {
     }
 
     /**
-     *  Change the player state to PLAYER_STATE_QUIT.
-     */
-    public void sendPlayerQuitRequest() {
-        final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
-        if (mCastConnectionManager.isConnectedToReceiver()) {
-            PendingResult<GameManagerClient.GameManagerResult> result =
-                    gameManagerClient.sendPlayerQuitRequest(null);
-            result.setResultCallback(new ResultCallback<GameManagerClient.GameManagerResult>() {
-                @Override
-                public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
-                    if (gameManagerResult.getStatus().isSuccess()) {
-                        ((MainActivity) getActivity())
-                                .setPlayerState(gameManagerClient.getCurrentState().getPlayer(
-                                        gameManagerResult.getPlayerId()).getPlayerState());
-                    } else {
-                        mCastConnectionManager.disconnectFromReceiver(false);
-                        Utils.showErrorDialog(getActivity(),
-                                gameManagerResult.getStatus().getStatusMessage());
-                    }
-                }
-            });
-        }
-    }
-
-    /**
      * Update the UI based on the current lobby and player state. The player has to first join
      * the lobby and then start the game.
      */
@@ -245,5 +219,4 @@ public class LobbyFragment extends GameFragment {
             }
         }
     }
-
 }
