@@ -84,6 +84,13 @@ public class SetupFragment extends GameFragment {
         mOberonCheckBox.setTag(OBERON_INDEX);
         mMorganaCheckBox.setTag(MORGANA_INDEX);
 
+        mMerlinCheckBox.setChecked(false);
+        mAssassinCheckBox.setChecked(false);
+        mPercivalCheckBox.setChecked(false);
+        mMordredCheckBox.setChecked(false);
+        mOberonCheckBox.setChecked(false);
+        mMorganaCheckBox.setChecked(false);
+
 
         mAssassinCheckBox.setEnabled(false);
         mPercivalCheckBox.setEnabled(false);
