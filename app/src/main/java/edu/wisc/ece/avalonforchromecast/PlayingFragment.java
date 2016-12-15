@@ -422,7 +422,6 @@ public class PlayingFragment extends GameFragment{
         }
     }
 
-
     /**
      * Handle voting phase.
      */

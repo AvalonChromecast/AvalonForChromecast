@@ -138,9 +138,6 @@ public class SetupFragment extends GameFragment {
             Log.d(TAG, "gameManagerClient in onStart is somehow null.");
             return;
         }
-        //GameManagerState state = gameManagerClient.getCurrentState();
-        //JSONObject gameData = state.getGameData();
-
 
         if(!getSetupLeader(gameManagerClient)){
             mTitleTextView.setText("Wait for setup leader to start the game.");

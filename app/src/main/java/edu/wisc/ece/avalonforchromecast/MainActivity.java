@@ -38,9 +38,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private String mPlayerName;
     private String mPlayerId;
     private String mLoyalty;
-    private boolean mSetupLeader;
-    private boolean[] mRolesArray;
-    private boolean mHasVoted;
 
     private CastConnectionManager mCastConnectionManager;
 
@@ -64,8 +61,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
         mLobbyFragment = new LobbyFragment();
         mSetupFragment = new SetupFragment();
         mGameOverFragment = new GameOverFragment();
-
-        mRolesArray = new boolean[6];
 
         updateFragments();
     }
@@ -214,29 +209,11 @@ public class MainActivity extends AppCompatActivity implements Observer {
         mPlayerName = playerName;
     }
 
-    public void setSetupLeader(boolean isLeader){
-        Log.d(TAG, "mSetupLeader is now " + isLeader);
-        mSetupLeader = isLeader;
-    }
-
-    public boolean getSetupLeader(){
-        return mSetupLeader;
-    }
-
     public void setLoyalty(String loyalty){
         mLoyalty = loyalty;
     }
+
     public String getLoyalty(){
         return mLoyalty;
     }
-
-//    public void setRolesArray(boolean[] rolesArray) {
-//        System.arraycopy(rolesArray, 0, mRolesArray, 0, 6);
-//    }
-//
-//    public boolean[] getRolesArray(){return mRolesArray;}
-
-    public void setHasVoted(boolean hasVoted){ mHasVoted = hasVoted; }
-
-    public boolean getHasVoted() {return mHasVoted;}
 }

@@ -149,7 +149,6 @@ public class LobbyFragment extends GameFragment {
         final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
         if (mCastConnectionManager.isConnectedToReceiver()) {
 
-            ((MainActivity) mActivity).setSetupLeader(true);
             // Send player name to the receiver
             JSONObject jsonMessage = new JSONObject();
             try {
@@ -168,14 +167,10 @@ public class LobbyFragment extends GameFragment {
                         ((MainActivity) mActivity)
                                 .setPlayerState(gameManagerClient.getCurrentState().getPlayer(
                                         gameManagerResult.getPlayerId()).getPlayerState());
-                        ((MainActivity) mActivity).setSetupLeader(false);
-
                     } else if(gameManagerResult.getStatus().getStatusCode() == GameManagerClient.STATUS_TOO_MANY_PLAYERS){
                         Toast.makeText(mActivity, "Please have 5 to 10 players", Toast.LENGTH_SHORT).show();
                     }
                     else {
-
-                        ((MainActivity) mActivity).setSetupLeader(false);
                         mCastConnectionManager.disconnectFromReceiver(false);
                         Utils.showErrorDialog(mActivity,
                                 gameManagerResult.getStatus().getStatusMessage());
