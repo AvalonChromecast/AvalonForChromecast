@@ -32,7 +32,11 @@ public class SetupFragment extends GameFragment {
 
     private static final String TAG = "SetupFragment";
 
+    private int bestChange = -1;
+    private String suggestion = "";
+
     private TextView mTitleTextView;
+    private TextView mPredictionView;
 
     private LinearLayout mCheckboxLayout;
     private CheckBox mMerlinCheckBox;
@@ -66,6 +70,7 @@ public class SetupFragment extends GameFragment {
         View view = inflater.inflate(R.layout.setup_fragment, container, false);
 
         mTitleTextView = (TextView) view.findViewById(R.id.titleTextView);
+        mPredictionView = (TextView) view.findViewById(R.id.predictionView);
 
         mCheckboxLayout = (LinearLayout) view.findViewById(R.id.checkboxLayout);
         mMerlinCheckBox = (CheckBox) view.findViewById(R.id.merlinCheckbox);
@@ -99,20 +104,52 @@ public class SetupFragment extends GameFragment {
 
         mMerlinCheckBox.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 onMerlinClicked();
+                setupSuggestions();
             }
         });
         mPercivalCheckBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
                 onPercivalClicked();
+                setupSuggestions();
+            }
+        });
+        mMordredCheckBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+                setupSuggestions();
+            }
+        });
+        mMorganaCheckBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+                setupSuggestions();
+            }
+        });
+        mOberonCheckBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+                setupSuggestions();
+            }
+        });
+        mAssassinCheckBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+                setupSuggestions();
             }
         });
         mSubmitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onSubmitClicked();
+            }
+        });
+        mPredictionView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+                displaySuggestion();
             }
         });
 
@@ -265,4 +302,175 @@ public class SetupFragment extends GameFragment {
             });
         }
     }
+
+    private double[] merlin =   {.8, .85, .9, .95, .95, .95};
+    private double[] assassin = {-.99, -.90, -.85, -.8, -.75, -.65};
+    private double[] percival = {.4, .25, .43, .48, .52, .37};
+    private double[] morgana =  {-.4, -.25, -.43, -.48, -.52, -.37};
+    private double[] oberon =   {.6, .6, .5, .5, .5, .4};
+    private double[] mordred =  {-.6, -.6, -.5, -.5, -.5, -.4};
+
+
+
+    private void setupSuggestions() {
+        final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
+        GameManagerState state = gameManagerClient.getCurrentState();
+        JSONObject gameData = state.getGameData();
+
+        int playerNum = state.getPlayersInState(GameManagerClient.PLAYER_STATE_PLAYING).size();
+
+        double selectionBalance = 0.0;
+
+        boolean[] roles = new boolean[6];
+
+        ArrayList<View> roleButtons;
+        roleButtons = mCheckboxLayout.getTouchables();
+
+        ArrayList<View> selectedRoles;
+        for (int i = 0; i < roleButtons.size(); i++) {
+            CheckBox currRole = (CheckBox) roleButtons.get(i);
+            if(currRole.isChecked()){
+                switch ((String) currRole.getTag()) {
+                    case "merlin":
+                        roles[MERLIN_INDEX] = true;
+                        selectionBalance += merlin[playerNum - 5];
+                        break;
+                    case "assassin":
+                        roles[ASSASSIN_INDEX] = true;
+                        selectionBalance += assassin[playerNum - 5];
+                        break;
+                    case "percival":
+                        roles[PERCIVAL_INDEX] = true;
+                        selectionBalance += percival[playerNum - 5];
+                        break;
+                    case "oberon":
+                        roles[OBERON_INDEX] = true;
+                        selectionBalance += oberon[playerNum - 5];
+                        break;
+                    case "morgana":
+                        roles[MORGANA_INDEX] = true;
+                        selectionBalance += morgana[playerNum - 5];
+                        break;
+                    case "mordred":
+                        roles[MORDRED_INDEX] = true;
+                        selectionBalance += mordred[playerNum - 5];
+                        break;
+                }
+            }
+        }
+
+        double oldBalance = selectionBalance;
+        double bestBalance = Math.abs(oldBalance);
+
+        if (Math.abs(selectionBalance) > 0.2) {
+            // Try adding role
+            for ( int i = 0; i < roles.length; i++) {
+                if (followsRules(roles, i)) {
+                    switch (i) {
+                        case MERLIN_INDEX:
+                            if(roles[i])
+                                selectionBalance -= merlin[playerNum - 5];
+                            else
+                                selectionBalance += merlin[playerNum - 5];
+                            break;
+                        case ASSASSIN_INDEX:
+                            if(roles[i])
+                                selectionBalance -= assassin[playerNum - 5];
+                            else
+                                selectionBalance += assassin[playerNum - 5];
+                            break;
+                        case PERCIVAL_INDEX:
+                            if(roles[i])
+                                selectionBalance -= percival[playerNum - 5];
+                            else
+                                selectionBalance += percival[playerNum - 5];
+                            break;
+                        case MORDRED_INDEX:
+                            if(roles[i])
+                                selectionBalance -= mordred[playerNum - 5];
+                            else
+                                selectionBalance += mordred[playerNum - 5];
+                            break;
+                        case MORGANA_INDEX:
+                            if(roles[i])
+                                selectionBalance -= morgana[playerNum - 5];
+                            else
+                                selectionBalance += morgana[playerNum - 5];
+                            break;
+                        case OBERON_INDEX:
+                            if(roles[i])
+                                selectionBalance -= oberon[playerNum - 5];
+                            else
+                                selectionBalance += oberon[playerNum - 5];
+                            break;
+                    }
+                }
+                if (Math.abs(selectionBalance) < bestBalance) {
+                    bestBalance = Math.abs(selectionBalance);
+                    bestChange = i;
+                    switch (i) {
+                        case MERLIN_INDEX:
+                            if(roles[i])
+                                suggestion = "Try deselecting Merlin";
+                            else
+                                suggestion = "Try selecting Merlin";
+                            break;
+                        case ASSASSIN_INDEX:
+                            if(roles[i])
+                                suggestion = "Try deselecting Assassin";
+                            else
+                                suggestion = "Try selecting Assassin";
+                            break;
+                        case PERCIVAL_INDEX:
+                            if(roles[i])
+                                suggestion = "Try deselecting Percival";
+                            else
+                                suggestion = "Try selecting Percival";
+                            break;
+                        case MORDRED_INDEX:
+                            if(roles[i])
+                                suggestion = "Try deselecting Mordred";
+                            else
+                                suggestion = "Try selecting Mordred";
+                            break;
+                        case MORGANA_INDEX:
+                            if(roles[i])
+                                suggestion = "Try deselecting Morgana";
+                            else
+                                suggestion = "Try selecting Morgana";
+                            break;
+                        case OBERON_INDEX:
+                            if(roles[i])
+                                suggestion = "Try deselecting Oberon";
+                            else
+                                suggestion = "Try selecting Oberon";
+                            break;
+                    }
+                }
+                selectionBalance = oldBalance;
+            }
+        }
+
+        double winPercentage = (selectionBalance + 1.0)/2.0 * 100;
+
+        mPredictionView.setText("Good wins " + winPercentage + "% of the time with this setup");
+    }
+
+    private void displaySuggestion() {
+        Toast.makeText(mActivity, suggestion, Toast.LENGTH_LONG).show;
+    }
+
+    private boolean followsRules(boolean[] roles, int i){
+        if(i==MERLIN_INDEX && roles[i]){
+            return !(roles[ASSASSIN_INDEX] || roles[MORDRED_INDEX]
+                    || roles[PERCIVAL_INDEX] || roles[MORGANA_INDEX]);
+        } else if((i==ASSASSIN_INDEX || i==MORDRED_INDEX || i==PERCIVAL_INDEX || i==MORGANA_INDEX) && !roles[i]){
+            if(i==MORGANA_INDEX) return roles[MERLIN_INDEX] || roles[PERCIVAL_INDEX];
+            return roles[MERLIN_INDEX];
+        } else if(i==PERCIVAL_INDEX && roles[i]){
+            return !roles[MORGANA_INDEX];
+        } else {return true;}
+    }
+
 }
+
