@@ -60,6 +60,15 @@
 
     </LinearLayout>
 
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/predictionView"
+        android:layout_above="@+id/submitButton"
+        android:layout_marginBottom="50dp" />
+
     <Button
         android:text="Start Game"
         android:layout_width="wrap_content"
@@ -69,4 +78,5 @@
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="20dp"
         android:layout_centerHorizontal="true" />
+
 </RelativeLayout>
