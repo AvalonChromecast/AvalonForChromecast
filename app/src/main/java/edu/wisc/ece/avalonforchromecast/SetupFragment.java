@@ -457,7 +457,7 @@ public class SetupFragment extends GameFragment {
     }
 
     private void displaySuggestion() {
-        Toast.makeText(mActivity, suggestion, Toast.LENGTH_LONG).show;
+        Toast.makeText(mActivity, suggestion, Toast.LENGTH_LONG).show();
     }
 
     private boolean followsRules(boolean[] roles, int i){
