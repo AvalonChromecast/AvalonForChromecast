@@ -595,7 +595,7 @@ public class PlayingFragment extends GameFragment{
         }
         else{
             mShowHideButton.setText("Show");
-            mPlayerRoleTextView.setVisibility(View.GONE);
+            mPlayerRoleTextView.setVisibility(View.INVISIBLE);
             mExtraInfoContainer.setVisibility(View.GONE);
         }
     }

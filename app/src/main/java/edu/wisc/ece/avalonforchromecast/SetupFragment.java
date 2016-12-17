@@ -267,7 +267,7 @@ public class SetupFragment extends GameFragment {
             //check if numEvilChecked is too large
             GameManagerState state = gameManagerClient.getCurrentState();
             List<PlayerInfo> players = state.getPlayersInState(GameManagerClient.PLAYER_STATE_PLAYING);
-            int maxEvilChecked = (int)Math.ceil(players.size() / 3);
+            int maxEvilChecked = (int)Math.ceil((double)players.size() / 3);
             Log.d(TAG, "numEvil, maxEvil: " + numEvilChecked + ", " + maxEvilChecked);
             if(numEvilChecked > maxEvilChecked){
                 Toast.makeText(mActivity, "You've selected too many evil roles", Toast.LENGTH_SHORT).show();
