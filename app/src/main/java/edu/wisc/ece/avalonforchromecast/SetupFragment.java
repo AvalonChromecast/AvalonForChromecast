@@ -22,6 +22,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -187,6 +188,7 @@ public class SetupFragment extends GameFragment {
             mTitleTextView.setText("Wait for setup leader to start the game.");
             mCheckboxLayout.setVisibility(View.GONE);
             mSubmitButton.setVisibility(View.GONE);
+            mPredictionView.setVisibility(View.GONE);
         }
     }
 
@@ -318,6 +320,9 @@ public class SetupFragment extends GameFragment {
         JSONObject gameData = state.getGameData();
 
         int playerNum = state.getPlayersInState(GameManagerClient.PLAYER_STATE_PLAYING).size();
+        if(playerNum < 5 || playerNum > 10){
+            return;
+        }
 
         double selectionBalance = 0.0;
 
@@ -330,28 +335,28 @@ public class SetupFragment extends GameFragment {
         for (int i = 0; i < roleButtons.size(); i++) {
             CheckBox currRole = (CheckBox) roleButtons.get(i);
             if(currRole.isChecked()){
-                switch ((String) currRole.getTag()) {
-                    case "merlin":
+                switch ((int)currRole.getTag()) {
+                    case MERLIN_INDEX:
                         roles[MERLIN_INDEX] = true;
                         selectionBalance += merlin[playerNum - 5];
                         break;
-                    case "assassin":
+                    case ASSASSIN_INDEX:
                         roles[ASSASSIN_INDEX] = true;
                         selectionBalance += assassin[playerNum - 5];
                         break;
-                    case "percival":
+                    case PERCIVAL_INDEX:
                         roles[PERCIVAL_INDEX] = true;
                         selectionBalance += percival[playerNum - 5];
                         break;
-                    case "oberon":
+                    case OBERON_INDEX:
                         roles[OBERON_INDEX] = true;
                         selectionBalance += oberon[playerNum - 5];
                         break;
-                    case "morgana":
+                    case MORGANA_INDEX:
                         roles[MORGANA_INDEX] = true;
                         selectionBalance += morgana[playerNum - 5];
                         break;
-                    case "mordred":
+                    case MORDRED_INDEX:
                         roles[MORDRED_INDEX] = true;
                         selectionBalance += mordred[playerNum - 5];
                         break;
@@ -445,19 +450,23 @@ public class SetupFragment extends GameFragment {
                             else
                                 suggestion = "Try selecting Oberon";
                             break;
+                        default:
+                            Log.e(TAG, "error???");
+                            break;
                     }
                 }
                 selectionBalance = oldBalance;
             }
         }
 
-        double winPercentage = (selectionBalance + 1.0)/2.0 * 100;
+        double winPercentage = Math.min(0.9999,(selectionBalance + 1.0)/2.0) * 100;
 
-        mPredictionView.setText("Good wins " + winPercentage + "% of the time with this setup");
+        DecimalFormat df = new DecimalFormat("#.##");
+        mPredictionView.setText("Good wins " + df.format(winPercentage) + "% of the time with this setup");
     }
 
     private void displaySuggestion() {
-        Toast.makeText(mActivity, suggestion, Toast.LENGTH_LONG).show;
+        Toast.makeText(mActivity, suggestion, Toast.LENGTH_LONG).show();
     }
 
     private boolean followsRules(boolean[] roles, int i){
