@@ -160,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
             if (mPlayerState == GameManagerClient.PLAYER_STATE_PLAYING) {
                 Log.d(TAG, "Player State is PLAYING");
                 if(gamePhase == SETUP_PHASE){
-                    fragment = mSetupFragment;
+                    fragment = new SetupFragment();
                 }
                 else if(gamePhase == GAMEOVER_PHASE){
                     fragment = mGameOverFragment;

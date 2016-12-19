@@ -48,6 +48,8 @@ public class LobbyFragment extends GameFragment {
         mSpinner = (ProgressBar) view.findViewById(R.id.spinner);
         mJoinStartButton = (Button) view.findViewById(R.id.button_join_start);
 
+        mJoinStartButton.setText(R.string.button_join);
+
         mJoinStartButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
