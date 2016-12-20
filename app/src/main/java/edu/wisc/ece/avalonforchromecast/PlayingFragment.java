@@ -32,8 +32,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Fragment for drawing.
- * Based on https://github.com/playgameservices/8bitartist
+ * Fragment displayed while the game is in progress, and the player is in game.
  */
 public class PlayingFragment extends GameFragment{
 
@@ -57,6 +56,7 @@ public class PlayingFragment extends GameFragment{
     private LinearLayout mExtraInfoContainer;
     private RadioGroup mTargetsContainer;
 
+    // enums for phases during the game
     private final int SELECTION_PHASE = 2;
     private final int VOTING_PHASE = 3;
     private final int MISSION_PHASE = 4;
@@ -69,6 +69,7 @@ public class PlayingFragment extends GameFragment{
     private final String OBERON = "oberon";
     private final String MORGANA = "morgana";
 
+    // enums for indexes of each role in a boolean array for whether a role is in play or not
     private final int MERLIN_INDEX = 0;
     private final int ASSASSIN_INDEX = 1;
     private final int PERCIVAL_INDEX = 2;
@@ -84,11 +85,9 @@ public class PlayingFragment extends GameFragment{
         setRetainInstance(true);
     }
 
-    // This be the real onCreate function where we do lots of setup
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment.
         View view = inflater.inflate(R.layout.playing_fragment, container, false);
 
         initialized = false;
@@ -165,6 +164,10 @@ public class PlayingFragment extends GameFragment{
         mActivity = activity;
     }
 
+    /**
+     * onStart contains a function that updates which phase the player should be in. Necessary if a
+     * player navigates away from the app while game phases are changing.
+     */
     @Override
     public void onStart() {
         super.onStart();
@@ -202,7 +205,7 @@ public class PlayingFragment extends GameFragment{
     }
 
     /**
-     * Game state callback handler.
+     * Listener for changes in GameManagerState. Updates what the current phase should be.
      */
     @Override
     public void onStateChanged(GameManagerState newState,
@@ -357,7 +360,8 @@ public class PlayingFragment extends GameFragment{
     }
 
     /**
-     * Handle selection phase.
+     * Display necessary UI for the selection phase. Leader displays a toggle button for each player
+     * and a submit button. Non-leaders get no display.
      */
     public void selectionPhase(GameManagerState gameState, JSONObject gameData){
         Log.d(TAG, "gameData: " + gameData.toString());
@@ -423,7 +427,7 @@ public class PlayingFragment extends GameFragment{
     }
 
     /**
-     * Handle voting phase.
+     * Display necessary UI for during the voting phase.
      */
     public void votingPhase(GameManagerState gameState, JSONObject gameData){
         mMissionTeamSizeView.setVisibility(View.GONE);
@@ -455,7 +459,8 @@ public class PlayingFragment extends GameFragment{
     }
 
     /**
-     * Handle mission phase.
+     * Display necessary UI for during the mission phase. Players on mission team get a pass or fail
+     * button displayed. Players not on mission team do not get any buttons displayed.
      */
     public void missionPhase(GameManagerState gameState, JSONObject gameData) {
 
@@ -521,7 +526,8 @@ public class PlayingFragment extends GameFragment{
     }
 
     /**
-     *Handle assassin phase.
+     * Display necessary UI for during the assassin phase. Assassin gets a list of good players to
+     * select from. Non-assassins get no buttons displayed.
      */
     public void assassinPhase(GameManagerState gameState, JSONObject gameData){
         mApproveSelectionButton.setVisibility(View.GONE);
@@ -587,6 +593,9 @@ public class PlayingFragment extends GameFragment{
         }
     }
 
+    /**
+     * Show/hide button click listener. Toggles visibility of role and loyalty.
+     */
     public void onShowHideButtonClicked(){
         if(mShowHideButton.getText().equals("Show")){
             mShowHideButton.setText("Hide");
@@ -601,7 +610,7 @@ public class PlayingFragment extends GameFragment{
     }
 
     /**
-     * Button click handler. Submit player selection.
+     * selection phase submit button click handler. Submit player selection to receiver application.
      */
     //find out how many buttons in playerButtonsContainer are toggled on
     //get current missionTeamSize from gameData
@@ -672,7 +681,7 @@ public class PlayingFragment extends GameFragment{
     }
 
     /**
-     * Button click handler. Approve team.
+     * Approve button click handler. Submits an approve to receiver application.
      */
     public void onApproveSelectionClicked(){
         final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
@@ -710,7 +719,7 @@ public class PlayingFragment extends GameFragment{
     }
 
     /**
-     * Button click handler. Reject team.
+     * Reject button click handler. Sends a reject to the receiver application.
      */
     public void onRejectSelectionClicked(){
         final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
@@ -748,7 +757,7 @@ public class PlayingFragment extends GameFragment{
     }
 
     /**
-     * Button click handler. Pass mission.
+     * Pass mission button click handler. Submits a pass to the receiver application.
      */
     public void onPassMissionClicked(){
         final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
@@ -786,7 +795,7 @@ public class PlayingFragment extends GameFragment{
     }
 
     /**
-     * Button click handler. Fail mission.
+     * Fail mission button click handler. Submits a fail to the receiver application.
      */
     public void onFailMissionClicked(){
         final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
@@ -824,7 +833,8 @@ public class PlayingFragment extends GameFragment{
     }
 
     /**
-     * Button click handler. Submit assassination target
+     * Submit assassination target button click handler. Submits assassination target to the
+     * receiver application.
      */
     public void onSubmitAssassinClicked(){
         final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();

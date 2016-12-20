@@ -29,21 +29,33 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
     private static final String TAG = "MainActivity";
 
+    //create instances of each fragment
     private CastConnectionFragment mCastConnectionFragment;
     private LobbyFragment mLobbyFragment;
     private PlayingFragment mPlayingFragment;
     private SetupFragment mSetupFragment;
     private GameOverFragment mGameOverFragment;
+
+    // local copy of player state, will be used to determine which fragment to go to
     private int mPlayerState = GameManagerClient.PLAYER_STATE_UNKNOWN;
+
+    // local copy of player's name
     private String mPlayerName;
+
+    // local copy of player's ID
     private String mPlayerId;
+
+    // local copy of player's loyalty
     private String mLoyalty;
 
+    // CastConnectionManager object takes care of all code needed to connect to Chromecast
     private CastConnectionManager mCastConnectionManager;
 
+    // enums for some phases of the game
     private static final int LOBBY_PHASE = 0;
     private static final int SETUP_PHASE = 1;
     private static final int GAMEOVER_PHASE = 6;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -131,6 +143,10 @@ public class MainActivity extends AppCompatActivity implements Observer {
         updateFragments();
     }
 
+    /**
+     * when this function is called, it updates which fragment is active based on what the current
+     * player state and game phase is
+     */
     public void updateFragments() {
         if (isChangingConfigurations() || isFinishing() || isDestroyed()) {
             return;
@@ -187,6 +203,10 @@ public class MainActivity extends AppCompatActivity implements Observer {
         moveTaskToBack(true);
     }
 
+    /**
+     * the following are functions that are getters and setters of local copies of certain
+     * player data
+     */
     public int getPlayerState() {
         return mPlayerState;
     }

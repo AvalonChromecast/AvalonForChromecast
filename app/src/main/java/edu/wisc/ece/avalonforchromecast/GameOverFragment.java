@@ -18,8 +18,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 /**
- * Fragment for drawing.
- * Based on https://github.com/playgameservices/8bitartist
+ * Fragment displayed during Game Over phase.
  */
 public class GameOverFragment extends GameFragment{
 
@@ -35,7 +34,6 @@ public class GameOverFragment extends GameFragment{
         setRetainInstance(true);
     }
 
-    // This be the real onCreate function where we do lots of setup
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -61,6 +59,9 @@ public class GameOverFragment extends GameFragment{
         mActivity = activity;
     }
 
+    /**
+     * display whether player won or not.
+     */
     @Override
     public void onStart() {
         super.onStart();
@@ -98,7 +99,8 @@ public class GameOverFragment extends GameFragment{
     }
 
     /**
-     * Game state callback handler.
+     * Listener for GameManagerState change. Sets player state if player state has changed, which
+     * also calls updateFragments.
      */
     @Override
     public void onStateChanged(GameManagerState newState,
@@ -113,7 +115,7 @@ public class GameOverFragment extends GameFragment{
     }
 
     /**
-     * Move the players back to lobby.
+     * Lobby button click listener. Move the players back to lobby.
      */
     public void onLobbyButtonClicked(){
         final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();

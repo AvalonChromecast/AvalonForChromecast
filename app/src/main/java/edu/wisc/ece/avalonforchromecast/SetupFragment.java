@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A fragment displayed while the player is in the game lobby.
+ * A fragment displayed while the player is in the setup phase.
  */
 public class SetupFragment extends GameFragment {
 
@@ -192,6 +192,9 @@ public class SetupFragment extends GameFragment {
         }
     }
 
+    /**
+     * returns true if player is the setup leader
+     */
     private boolean getSetupLeader(GameManagerClient gameManagerClient) {
         GameManagerState state = gameManagerClient.getCurrentState();
         JSONObject gameData = state.getGameData();
@@ -209,6 +212,9 @@ public class SetupFragment extends GameFragment {
 
     }
 
+    /**
+     * Merlin checkbox click listener. Enable or disable checkboxes for roles that depend on merlin
+     */
     private void onMerlinClicked() {
         if(mMerlinCheckBox.isChecked()){
             mAssassinCheckBox.setEnabled(true);
@@ -226,6 +232,9 @@ public class SetupFragment extends GameFragment {
         }
     }
 
+    /**
+     * Percival checkbox click listenr. Enable or disable checkbox for roles that depend on percival
+     */
     private void onPercivalClicked() {
         if(mPercivalCheckBox.isChecked()){
             mMorganaCheckBox.setEnabled(true);
@@ -237,7 +246,7 @@ public class SetupFragment extends GameFragment {
     }
 
     /**
-     * Submit selected roles to receiver
+     * Submit button click listener. Submit selected roles to receiver
      */
     private void onSubmitClicked() {
         final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
@@ -312,8 +321,11 @@ public class SetupFragment extends GameFragment {
     private double[] oberon =   {.6, .6, .5, .5, .5, .4};
     private double[] mordred =  {-.6, -.6, -.5, -.5, -.5, -.4};
 
-
-
+    /**
+     * This is the smart algorithm. Called whenever a role checkbox is clicked. Updates what the
+     * current balance is based on what roles are currently selected. Also updates the current role
+     * suggestion.
+     */
     private void setupSuggestions() {
         final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
         GameManagerState state = gameManagerClient.getCurrentState();
@@ -332,6 +344,7 @@ public class SetupFragment extends GameFragment {
         roleButtons = mCheckboxLayout.getTouchables();
 
         ArrayList<View> selectedRoles;
+        // computes the current role selection's balance
         for (int i = 0; i < roleButtons.size(); i++) {
             CheckBox currRole = (CheckBox) roleButtons.get(i);
             if(currRole.isChecked()){
@@ -367,6 +380,8 @@ public class SetupFragment extends GameFragment {
         double oldBalance = selectionBalance;
         double bestBalance = Math.abs(oldBalance);
 
+        // constructs the best possible suggestion by computing what the new balance of each potential
+        // suggestion would be, then choosing the selection that comes closest to perfect balance
         if (Math.abs(selectionBalance) > 0.2) {
             // Try adding role
             for ( int i = 0; i < roles.length; i++) {
@@ -465,10 +480,17 @@ public class SetupFragment extends GameFragment {
         mPredictionView.setText("Good wins " + df.format(winPercentage) + "% of the time with this setup");
     }
 
+    /**
+     * Displays the suggestion that was calculated in setupSuggestions().
+     */
     private void displaySuggestion() {
         Toast.makeText(mActivity, suggestion, Toast.LENGTH_LONG).show();
     }
 
+    /**
+     * determines if a potential suggestion doesn't break the rules of suggesting a role that depends
+     * on a different role that is not currently selected.
+     */
     private boolean followsRules(boolean[] roles, int i){
         if(i==MERLIN_INDEX && roles[i]){
             return !(roles[ASSASSIN_INDEX] || roles[MORDRED_INDEX]

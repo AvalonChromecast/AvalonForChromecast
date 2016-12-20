@@ -78,7 +78,7 @@ public class LobbyFragment extends GameFragment {
     }
 
     /**
-     * Button click handler. Set the new player state based on the current player state.
+     * Join/Start button click handler. Set the new player state based on the current player state.
      */
     private void onJoinStartClicked() {
         GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
@@ -145,7 +145,8 @@ public class LobbyFragment extends GameFragment {
     }
 
     /**
-     * Change the player state to PLAYER_STATE_PLAYING.
+     * Change the player state to PLAYER_STATE_PLAYING. Also will signal to receiver to start the
+     * game.
      */
     public void sendStartGameRequest() {
         final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
@@ -211,6 +212,9 @@ public class LobbyFragment extends GameFragment {
         }
     }
 
+    /**
+     * listener for if player state has changed or game data has changed
+     */
     @Override
     public void onStateChanged(GameManagerState newState, GameManagerState oldState){
         Log.d(TAG, "Enter lobbyfragment's onStateChanged");
