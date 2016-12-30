@@ -26,7 +26,6 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
 
-        android:textColor="@android:color/white"
         android:textStyle="bold" />
 
     <LinearLayout
@@ -44,8 +43,7 @@
         android:layout_below="@+id/extraInfoContainer"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="11dp"
-        android:id="@+id/missionTeamSizeView"
-        android:textColor="@android:color/white" />
+        android:id="@+id/missionTeamSizeView" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -54,7 +52,6 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="11dp"
         android:id="@+id/playHintView"
-        android:textColor="@android:color/white"
         android:textSize="20sp"
         android:gravity="center" />
 

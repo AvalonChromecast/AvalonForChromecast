@@ -16,7 +16,8 @@ limitations under the License.
 -->
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
              android:layout_height="match_parent"
              android:measureAllChildren="false">
 
@@ -30,9 +31,8 @@ limitations under the License.
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Avalon"
-                android:textSize="70sp"
-                android:textStyle="bold"
-                android:textColor="@android:color/white"/>
+            android:textStyle="bold"
+            android:textSize="70sp" />
         <ProgressBar
                 android:id="@+id/spinner"
                 style="?android:attr/progressBarStyleLarge"

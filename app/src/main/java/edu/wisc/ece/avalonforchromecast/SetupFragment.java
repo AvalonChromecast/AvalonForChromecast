@@ -83,6 +83,8 @@ public class SetupFragment extends GameFragment {
 
         mSubmitButton = (Button) view.findViewById(R.id.submitButton);
 
+        mPredictionView.setVisibility(View.GONE);
+
         mMerlinCheckBox.setTag(MERLIN_INDEX);
         mAssassinCheckBox.setTag(ASSASSIN_INDEX);
         mPercivalCheckBox.setTag(PERCIVAL_INDEX);

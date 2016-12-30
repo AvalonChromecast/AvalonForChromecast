@@ -171,8 +171,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 e.printStackTrace();
             }
 
-            Log.d(TAG, "gamePhase is " + gamePhase);
-
             if (mPlayerState == GameManagerClient.PLAYER_STATE_PLAYING) {
                 Log.d(TAG, "Player State is PLAYING");
                 if(gamePhase == SETUP_PHASE){
