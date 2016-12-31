@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">AvalonForChromecast</string>
+    <string name="app_name">Avaloncast</string>
 
     <string name="app_id">5B16CA24</string>
     <string name="namespace">urn:x-cast:com.google.cast.sample.helloworld</string>
