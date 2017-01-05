@@ -21,18 +21,37 @@ limitations under the License.
              android:layout_height="match_parent"
              android:measureAllChildren="false">
 
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="60dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Avalon"
+            android:textStyle="bold"
+            android:textSize="70sp" />
+
+        <TextView
+            android:text="Make sure you are connected to the same Wi-Fi as the Chromecast!"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/wifi_label"
+            android:layout_below="@+id/title"
+            android:textSize="24sp"
+            android:layout_marginTop="40dp" />
+
+    </RelativeLayout>
+
     <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center">
-        <TextView
-                android:id="@+id/connect_label"
-                android:gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Avalon"
-            android:textStyle="bold"
-            android:textSize="70sp" />
+
         <ProgressBar
                 android:id="@+id/spinner"
                 style="?android:attr/progressBarStyleLarge"
@@ -40,6 +59,38 @@ limitations under the License.
                 android:layout_height="wrap_content"
                 android:visibility="gone">
         </ProgressBar>
+
+
     </FrameLayout>
+
+    <RelativeLayout
+        android:padding="20dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="100dp"
+        android:layout_width="wrap_content"
+        android:background="@android:color/holo_green_dark">
+
+        <android.support.v7.app.MediaRouteButton
+            android:id="@+id/media_route_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:mediaRouteTypes="user"
+            android:visibility="gone"
+            android:paddingRight="100dp"
+            android:elevation="1dp" />
+
+        <TextView
+            android:text="Connect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView"
+            android:layout_weight="1"
+            android:textSize="30sp"
+            android:layout_centerInParent="false"
+            android:layout_marginLeft="50dp" />
+
+    </RelativeLayout>
 
 </FrameLayout>

@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.MediaRouteActionProvider;
+import android.support.v7.app.MediaRouteButton;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -51,6 +52,9 @@ public class MainActivity extends AppCompatActivity implements Observer {
     // CastConnectionManager object takes care of all code needed to connect to Chromecast
     private CastConnectionManager mCastConnectionManager;
 
+    // Media Route Button
+    private MediaRouteButton mMediaRouteButton;
+
     // enums for some phases of the game
     private static final int LOBBY_PHASE = 0;
     private static final int SETUP_PHASE = 1;
@@ -63,8 +67,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
         setContentView(R.layout.main_activity);
 
         // Set up Toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
 
         mCastConnectionManager = new CastConnectionManager(this,
                 getResources().getString(R.string.app_id));
@@ -233,5 +237,13 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
     public String getLoyalty(){
         return mLoyalty;
+    }
+
+    public MediaRouteButton getMediaRouteButton() { return mMediaRouteButton; }
+
+    public void setMediaRouteButton(MediaRouteButton mediaRouteButton)
+    {
+        mMediaRouteButton = mediaRouteButton;
+        mCastConnectionManager.setMediaRouteButton(mediaRouteButton);
     }
 }

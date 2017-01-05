@@ -14,10 +14,12 @@ import com.google.android.gms.common.api.Status;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v7.app.MediaRouteButton;
 import android.support.v7.media.MediaRouteSelector;
 import android.support.v7.media.MediaRouter;
 import android.support.v7.media.MediaRouter.RouteInfo;
 import android.util.Log;
+import android.view.View;
 
 import java.util.Observable;
 
@@ -34,6 +36,7 @@ public class CastConnectionManager extends Observable {
     private final MediaRouter mMediaRouter;
     private final MediaRouteSelector mMediaRouteSelector;
     private final MediaRouter.Callback mMediaRouteCallback;
+    private MediaRouteButton mMediaRouteButton;
     private CastDevice mSelectedDevice;
 
     private GoogleApiClient mApiClient;
@@ -52,6 +55,19 @@ public class CastConnectionManager extends Observable {
 
         // Create a MediaRouter callback for discovery events.
         mMediaRouteCallback = new MediaRouteCallback();
+
+//        mMediaRouteButton = ((MainActivity) context).getMediaRouteButton();
+//        mMediaRouteButton.setRouteSelector(mMediaRouteSelector);
+//        mMediaRouteButton.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * Set the MediaRouteButton selector for device discovery.
+     */
+    public void setMediaRouteButton(MediaRouteButton mediaRouteButton){
+        mMediaRouteButton = mediaRouteButton;
+        mMediaRouteButton.setRouteSelector(mMediaRouteSelector);
+        mMediaRouteButton.setVisibility(View.VISIBLE);
     }
 
     /**

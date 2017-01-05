@@ -1,6 +1,8 @@
 package edu.wisc.ece.avalonforchromecast;
 
+import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.MediaRouteButton;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,18 +19,34 @@ public class CastConnectionFragment extends GameFragment {
 
     private View mConnectLabel;
     private View mSpinner;
+    private MediaRouteButton mMediaRouteButton;
+
+    private Activity mActivity;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.cast_connection_fragment, container, false);
-        mConnectLabel = view.findViewById(R.id.connect_label);
         mSpinner = view.findViewById(R.id.spinner);
 
-        Log.d(TAG, "Avalon should be visible");
-        mConnectLabel.setVisibility(View.VISIBLE);
+        // Set the MediaRouteButton selector for device discovery.
+        mMediaRouteButton = (MediaRouteButton) view.findViewById(R.id.media_route_button);
+        ((MainActivity) mActivity).setMediaRouteButton(mMediaRouteButton);
+        //mCastConnectionManager.setMediaRouteButton(mMediaRouteButton);
 
         return view;
+    }
+
+    @Override
+    public void onAttach(Activity activity){
+        super.onAttach(activity);
+        mActivity = activity;
     }
 
     @Override
@@ -39,10 +57,8 @@ public class CastConnectionFragment extends GameFragment {
         // Once the user has selected a Cast device, show a progress indicator.
         // MainActivity will load the lobby fragment next.
         if (mCastConnectionManager.getSelectedDevice() != null) {
-            mConnectLabel.setVisibility(View.GONE);
             mSpinner.setVisibility(View.VISIBLE);
         } else {
-            mConnectLabel.setVisibility(View.VISIBLE);
             mSpinner.setVisibility(View.GONE);
         }
     }
