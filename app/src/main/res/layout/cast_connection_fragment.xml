@@ -34,7 +34,8 @@ limitations under the License.
             android:layout_height="wrap_content"
             android:text="Avalon"
             android:textStyle="bold"
-            android:textSize="70sp" />
+            android:textSize="70sp"
+            android:textColor="@android:color/white" />
 
         <TextView
             android:text="Make sure you are connected to the same Wi-Fi as the Chromecast!"
@@ -43,7 +44,8 @@ limitations under the License.
             android:id="@+id/wifi_label"
             android:layout_below="@+id/title"
             android:textSize="24sp"
-            android:layout_marginTop="40dp" />
+            android:layout_marginTop="40dp"
+            android:textColor="@android:color/white" />
 
     </RelativeLayout>
 
@@ -69,17 +71,17 @@ limitations under the License.
         android:layout_gravity="bottom|center"
         android:layout_marginBottom="100dp"
         android:layout_width="wrap_content"
-        android:background="@android:color/holo_green_dark">
+        android:background="@android:color/holo_green_dark"
+        android:elevation="2dp">
 
         <android.support.v7.app.MediaRouteButton
             android:id="@+id/media_route_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:mediaRouteTypes="user"
             android:visibility="gone"
             android:paddingRight="100dp"
-            android:elevation="1dp" />
+            android:elevation="0dp" />
 
         <TextView
             android:text="Connect"

@@ -12,9 +12,11 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,10 +43,12 @@ public class PlayingFragment extends GameFragment{
     private boolean initialized;
 
     private TextView mPlayerRoleTextView;
+    private TextView mPLayerLoyaltyTextView;
     private TextView mMissionTeamSizeView;
     private TextView mPlayHintView;
 
     private Button mShowHideButton;
+    private Button mPauseButton;
     private Button mSubmitSelectionButton;
     private Button mApproveSelectionButton;
     private Button mRejectSelectionButton;
@@ -52,6 +56,7 @@ public class PlayingFragment extends GameFragment{
     private Button mFailMissionButton;
     private Button mSubmitAssassinButton;
 
+    private LinearLayout mLoyaltyRoleContainer;
     private LinearLayout mPlayerButtonsContainer;
     private LinearLayout mExtraInfoContainer;
     private RadioGroup mTargetsContainer;
@@ -61,6 +66,11 @@ public class PlayingFragment extends GameFragment{
     private final int VOTING_PHASE = 3;
     private final int MISSION_PHASE = 4;
     private final int ASSASSIN_PHASE = 5;
+
+    // enums for pause fragments
+    private static final int PAUSE_FRAGMENT = 0;
+    private static final int ROLES_FRAGMENT = 1;
+    private static final int RULES_FRAGMENT = 2;
 
     private final String MERLIN = "merlin";
     private final String ASSASSIN = "assassin";
@@ -92,11 +102,13 @@ public class PlayingFragment extends GameFragment{
 
         initialized = false;
 
+        mPLayerLoyaltyTextView = (TextView) view.findViewById(R.id.loyaltyTextView);
         mPlayerRoleTextView = (TextView) view.findViewById(R.id.roleTextView);
         mMissionTeamSizeView = (TextView) view.findViewById(R.id.missionTeamSizeView);
         mPlayHintView = (TextView) view.findViewById(R.id.playHintView);
 
         mShowHideButton = (Button) view.findViewById(R.id.showHideButton);
+        mPauseButton = (Button) view.findViewById(R.id.pause_button);
         mSubmitSelectionButton = (Button) view.findViewById(R.id.submitSelectionButton);
         mApproveSelectionButton = (Button) view.findViewById(R.id.approveSelectionButton);
         mRejectSelectionButton = (Button) view.findViewById(R.id.rejectSelectionButton);
@@ -104,6 +116,7 @@ public class PlayingFragment extends GameFragment{
         mFailMissionButton = (Button) view.findViewById(R.id.failMissionButton);
         mSubmitAssassinButton = (Button) view.findViewById(R.id.submitAssassinButton);
 
+        mLoyaltyRoleContainer = (LinearLayout) view.findViewById(R.id.loyalty_role);
         mPlayerButtonsContainer = (LinearLayout) view.findViewById(R.id.playerButtonsContainer);
         mExtraInfoContainer = (LinearLayout) view.findViewById(R.id.extraInfoContainer);
 
@@ -121,6 +134,12 @@ public class PlayingFragment extends GameFragment{
             @Override
             public void onClick(View v) {
                 onShowHideButtonClicked();
+            }
+        });
+        mPauseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onPauseClicked();
             }
         });
 
@@ -265,7 +284,8 @@ public class PlayingFragment extends GameFragment{
 
         ((MainActivity) mActivity).setLoyalty(loyalty);
 
-        mPlayerRoleTextView.setText(loyalty + " - " + role);
+        mPLayerLoyaltyTextView.setText("Loyalty: " + loyalty);
+        mPlayerRoleTextView.setText("Role: " + role);
         mMissionTeamSizeView.setText("");
         mExtraInfoContainer.removeAllViews();
 
@@ -279,6 +299,8 @@ public class PlayingFragment extends GameFragment{
         //boolean[] rolesArray= Arrays.copyOf(((MainActivity)mActivity).getRolesArray(),6);
 
         TextView header = new TextView(mActivity);
+        header.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+        header.setTextColor(Color.WHITE);
         mExtraInfoContainer.addView(header);
 
 
@@ -309,9 +331,7 @@ public class PlayingFragment extends GameFragment{
                 Log.d(TAG, "Current player's role: " + currPlayerRole);
                 if(currPlayerLoyalty.equals("evil") && !myPlayerId.equals(currPlayerId)){
                     if( !((isEvil && currPlayerRole.equals(OBERON)) ||(isMerlin && currPlayerRole.equals(MORDRED)))) {
-                        TextView evils = new TextView(mActivity);
-                        evils.setText(currPlayerName);
-                        mExtraInfoContainer.addView(evils);
+                        addExtraInfo(currPlayerName);
                     }
                 }
             }
@@ -329,9 +349,7 @@ public class PlayingFragment extends GameFragment{
             }
             if(morganaName.equals("")) {
                 header.setText("Merlin:");
-                TextView tv = new TextView(mActivity);
-                tv.setText(merlinName);
-                mExtraInfoContainer.addView(tv);
+                addExtraInfo(merlinName);
             }else {
                 header.setText("Merlin or Morgana");
 
@@ -339,24 +357,25 @@ public class PlayingFragment extends GameFragment{
                 boolean merlinFirst = rng.nextBoolean();
 
                 if(merlinFirst) {
-                    TextView tv = new TextView(mActivity);
-                    tv.setText(merlinName);
-                    mExtraInfoContainer.addView(tv);
-
-                    tv = new TextView(mActivity);
-                    tv.setText(morganaName);
-                    mExtraInfoContainer.addView(tv);
+                    addExtraInfo(merlinName);
+                    addExtraInfo(morganaName);
                 } else {
-                    TextView tv = new TextView(mActivity);
-                    tv.setText(morganaName);
-                    mExtraInfoContainer.addView(tv);
-
-                    tv = new TextView(mActivity);
-                    tv.setText(merlinName);
-                    mExtraInfoContainer.addView(tv);
+                    addExtraInfo(morganaName);
+                    addExtraInfo(merlinName);
                 }
             }
         }
+    }
+
+    /**
+     * helper method to add textview to extraInfoContainer
+     */
+    private void addExtraInfo(String text){
+        TextView tv = new TextView(mActivity);
+        tv.setText(text);
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+        tv.setTextColor(Color.WHITE);
+        mExtraInfoContainer.addView(tv);
     }
 
     /**
@@ -421,7 +440,7 @@ public class PlayingFragment extends GameFragment{
             mMissionTeamSizeView.setText("Select " + teamSize + " people for the mission");
         }
         else{
-            mPlayHintView.setText("You are not the leader. Wait for the team leader selects mission team");
+            mPlayHintView.setText("Wait for the leader to select a Quest Team.");
             mPlayHintView.setVisibility(View.VISIBLE);
         }
     }
@@ -433,7 +452,7 @@ public class PlayingFragment extends GameFragment{
         mMissionTeamSizeView.setVisibility(View.GONE);
         mPlayHintView.setVisibility(View.GONE);
 
-        Toast.makeText(mActivity, "Selected mission team is shown on the TV", Toast.LENGTH_LONG).show();
+        Toast.makeText(mActivity, "Selected quest team is shown on the TV", Toast.LENGTH_LONG).show();
 
         Vibrator v = (Vibrator) mActivity.getSystemService(Context.VIBRATOR_SERVICE);
         // Vibrate for 250 milliseconds
@@ -519,7 +538,7 @@ public class PlayingFragment extends GameFragment{
                 }
             }
         } else {
-            mPlayHintView.setText("You are not on the mission. Wait for the mission team make their selections");
+            mPlayHintView.setText("Wait for the team to embark on the Quest.");
             mPlayHintView.setVisibility(View.VISIBLE);
             Toast.makeText(mActivity, "You are not on the mission", Toast.LENGTH_LONG).show();
         }
@@ -599,14 +618,22 @@ public class PlayingFragment extends GameFragment{
     public void onShowHideButtonClicked(){
         if(mShowHideButton.getText().equals("Show")){
             mShowHideButton.setText("Hide");
-            mPlayerRoleTextView.setVisibility(View.VISIBLE);
+            mLoyaltyRoleContainer.setVisibility(View.VISIBLE);
             mExtraInfoContainer.setVisibility(View.VISIBLE);
         }
         else{
             mShowHideButton.setText("Show");
-            mPlayerRoleTextView.setVisibility(View.INVISIBLE);
+            mLoyaltyRoleContainer.setVisibility(View.INVISIBLE);
             mExtraInfoContainer.setVisibility(View.GONE);
         }
+    }
+
+    /**
+     * Pause button click listener.
+     */
+    private void onPauseClicked() {
+        ((MainActivity)mActivity).setPaused(true);
+        ((MainActivity)mActivity).updatePauseFragment(PAUSE_FRAGMENT);
     }
 
     /**

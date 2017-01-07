@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -26,9 +27,11 @@ public class LobbyFragment extends GameFragment {
 
     private static final String TAG = "LobbyFragment";
 
+    private TextView mTextLabel;
     private EditText mNameEditText;
-    private Button mJoinStartButton;
-    private ProgressBar mSpinner;
+    private Button mJoinSetButton;
+    private Button mBackButton;
+    private Button mStartButton;
 
     private Activity mActivity;
 
@@ -44,16 +47,28 @@ public class LobbyFragment extends GameFragment {
         // Inflate the layout for this fragment.
         View view = inflater.inflate(R.layout.lobby_fragment, container, false);
 
+        mTextLabel = (TextView) view.findViewById(R.id.text_label);
         mNameEditText = (EditText) view.findViewById(R.id.name);
-        mSpinner = (ProgressBar) view.findViewById(R.id.spinner);
-        mJoinStartButton = (Button) view.findViewById(R.id.button_join_start);
+        mJoinSetButton = (Button) view.findViewById(R.id.join_set_button);
+        mBackButton = (Button) view.findViewById(R.id.back_button);
+        mStartButton = (Button) view.findViewById(R.id.start_button);
 
-        mJoinStartButton.setText(R.string.button_join);
-
-        mJoinStartButton.setOnClickListener(new View.OnClickListener() {
+        mJoinSetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onJoinStartClicked();
+                onJoinSetClicked();
+            }
+        });
+        mBackButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackClicked();
+            }
+        });
+        mStartButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onStartClicked();
             }
         });
         return view;
@@ -72,36 +87,70 @@ public class LobbyFragment extends GameFragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        mJoinSetButton.setText(R.string.button_join);
+        updateView();
+    }
+
+    @Override
     public void onDestroy(){
         //sendPlayerQuitRequest();
         super.onDestroy();
     }
 
     /**
-     * Join/Start button click handler. Set the new player state based on the current player state.
+     * Join/Set button click handler. Set player state to ready.
      */
-    private void onJoinStartClicked() {
+    private void onJoinSetClicked() {
         GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
         GameManagerState state = gameManagerClient.getCurrentState();
 
         int playerState = ((MainActivity) mActivity).getPlayerState();
-        if (playerState == GameManagerClient.PLAYER_STATE_AVAILABLE) {
+        if (playerState == GameManagerClient.PLAYER_STATE_AVAILABLE || playerState == GameManagerClient.PLAYER_STATE_READY) {
             //if lobby state is closed
-            if(state.getLobbyState() == GameManagerClient.LOBBY_STATE_CLOSED){
+            if (state.getLobbyState() == GameManagerClient.LOBBY_STATE_CLOSED) {
                 Toast.makeText(mActivity, "Please wait until the game is finished", Toast.LENGTH_SHORT).show();
-            }
-            else{
+            } else {
                 ((MainActivity) mActivity).setPlayerName(mNameEditText.getText().toString());
                 sendPlayerReadyRequest();
             }
-        } else if (playerState == GameManagerClient.PLAYER_STATE_READY) {
-            sendStartGameRequest();
         }
         updateView();
     }
 
     /**
-     * Change the player state to PLAYER_STATE_READY.
+     * Back button click handler. Quits player from game and returns them to main screen.
+     */
+    private void onBackClicked(){
+        sendPlayerQuitRequest();
+        mCastConnectionManager.disconnectFromReceiver(false);
+    }
+
+    /**
+     * Start button click handler. Starts the game and sets player as setup leader
+     */
+    private void onStartClicked(){
+        GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
+        GameManagerState state = gameManagerClient.getCurrentState();
+
+        int playerState = ((MainActivity) mActivity).getPlayerState();
+        if (playerState == GameManagerClient.PLAYER_STATE_AVAILABLE) {
+            Toast.makeText(mActivity, "Enter your name first.", Toast.LENGTH_SHORT).show();
+        } else if (playerState == GameManagerClient.PLAYER_STATE_READY) {
+            if(state.getLobbyState() == GameManagerClient.LOBBY_STATE_CLOSED){
+                Toast.makeText(mActivity, "Please wait until the game is finished", Toast.LENGTH_SHORT).show();
+            }
+            else{
+                ((MainActivity) mActivity).setPlayerName(mNameEditText.getText().toString());
+                sendStartGameRequest();
+            }
+        }
+        updateView();
+    }
+
+    /**
+     * Change the player state to PLAYER_STATE_READY while setting player name.
      */
     public void sendPlayerReadyRequest() {
         final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
@@ -166,7 +215,7 @@ public class LobbyFragment extends GameFragment {
                 @Override
                 public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
                     if (gameManagerResult.getStatus().isSuccess()) {
-                        Toast.makeText(mActivity, "Start Game success, you're setup leader", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(mActivity, "Start Game success, you're setup leader", Toast.LENGTH_SHORT).show();
                         ((MainActivity) mActivity)
                                 .setPlayerState(gameManagerClient.getCurrentState().getPlayer(
                                         gameManagerResult.getPlayerId()).getPlayerState());
@@ -174,6 +223,41 @@ public class LobbyFragment extends GameFragment {
                         Toast.makeText(mActivity, "Please have 5 to 10 players", Toast.LENGTH_SHORT).show();
                     }
                     else {
+                        mCastConnectionManager.disconnectFromReceiver(false);
+                        Utils.showErrorDialog(mActivity,
+                                gameManagerResult.getStatus().getStatusMessage());
+                    }
+                    updateView();
+                }
+            });
+        }
+        updateView();
+    }
+
+    /**
+     * Disconnects player from the chromecast.
+     */
+    public void sendPlayerQuitRequest(){
+        final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
+        if (mCastConnectionManager.isConnectedToReceiver()) {
+            // Send player name to the receiver
+            final JSONObject jsonMessage = new JSONObject();
+            try {
+                jsonMessage.put("playerName", mNameEditText.getText().toString());
+            } catch (JSONException e) {
+                Log.e(TAG, "Error creating JSON message", e);
+                return;
+            }
+            PendingResult<GameManagerClient.GameManagerResult> result =
+                    gameManagerClient.sendPlayerQuitRequest(jsonMessage);
+            result.setResultCallback(new ResultCallback<GameManagerClient.GameManagerResult>() {
+                @Override
+                public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
+                    if (gameManagerResult.getStatus().isSuccess()) {
+                        ((MainActivity) mActivity)
+                                .setPlayerState(gameManagerClient.getCurrentState().getPlayer(
+                                        gameManagerResult.getPlayerId()).getPlayerState());
+                    } else {
                         mCastConnectionManager.disconnectFromReceiver(false);
                         Utils.showErrorDialog(mActivity,
                                 gameManagerResult.getStatus().getStatusMessage());
@@ -198,16 +282,19 @@ public class LobbyFragment extends GameFragment {
         if (mCastConnectionManager.isConnectedToReceiver()) {
             GameManagerState gameManagerState = gameManagerClient.getCurrentState();
             if (gameManagerState.getLobbyState() == GameManagerClient.LOBBY_STATE_OPEN) {
-                mJoinStartButton.setVisibility(View.VISIBLE);
-                mSpinner.setVisibility(View.GONE);
+                mJoinSetButton.setEnabled(true);
+                mTextLabel.setText(R.string.lobby_open);
                 if (playerState == GameManagerClient.PLAYER_STATE_AVAILABLE) {
-                    mJoinStartButton.setText(R.string.button_join);
+                    mJoinSetButton.setText(R.string.button_join);
+                    mStartButton.setEnabled(false);
                 } else if (playerState == GameManagerClient.PLAYER_STATE_READY) {
-                    mJoinStartButton.setText(R.string.button_start);
+                    mJoinSetButton.setText(R.string.button_set);
+                    mStartButton.setEnabled(true);
                 }
             } else {
-                mJoinStartButton.setVisibility(View.GONE);
-                mSpinner.setVisibility(View.VISIBLE);
+                mJoinSetButton.setEnabled(false);
+                mStartButton.setEnabled(false);
+                mTextLabel.setText(R.string.lobby_closed);
             }
         }
     }
@@ -223,10 +310,6 @@ public class LobbyFragment extends GameFragment {
             ((MainActivity) mActivity).setPlayerState(newState.getPlayer(
                     playerId).getPlayerState());
         }
-        if(newState.hasGameDataChanged(oldState)) {
-            if(newState.getGameData() != null) {
-                updateView();
-            }
-        }
+        updateView();
     }
 }

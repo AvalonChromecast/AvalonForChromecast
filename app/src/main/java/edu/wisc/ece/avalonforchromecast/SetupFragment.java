@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,6 +37,8 @@ public class SetupFragment extends GameFragment {
     private int bestChange = -1;
     private String suggestion = "";
 
+    private RelativeLayout mLeaderLayout;
+
     private TextView mTitleTextView;
     private TextView mPredictionView;
 
@@ -48,6 +51,8 @@ public class SetupFragment extends GameFragment {
     private CheckBox mMorganaCheckBox;
 
     private Button mSubmitButton;
+    private Button mBackButton;
+    private Button mPauseButton;
 
     private final int MERLIN_INDEX = 0;
     private final int ASSASSIN_INDEX = 1;
@@ -55,6 +60,11 @@ public class SetupFragment extends GameFragment {
     private final int MORDRED_INDEX = 3;
     private final int OBERON_INDEX = 4;
     private final int MORGANA_INDEX = 5;
+
+    // enums for pause fragments
+    private static final int PAUSE_FRAGMENT = 0;
+    private static final int ROLES_FRAGMENT = 1;
+    private static final int RULES_FRAGMENT = 2;
 
     private Activity mActivity;
 
@@ -70,6 +80,8 @@ public class SetupFragment extends GameFragment {
         // Inflate the layout for this fragment.
         View view = inflater.inflate(R.layout.setup_fragment, container, false);
 
+        mLeaderLayout = (RelativeLayout) view.findViewById(R.id.leaderLayout);
+
         mTitleTextView = (TextView) view.findViewById(R.id.titleTextView);
         mPredictionView = (TextView) view.findViewById(R.id.predictionView);
 
@@ -82,6 +94,8 @@ public class SetupFragment extends GameFragment {
         mMorganaCheckBox = (CheckBox) view.findViewById(R.id.morganaCheckbox);
 
         mSubmitButton = (Button) view.findViewById(R.id.submitButton);
+        mBackButton = (Button) view.findViewById(R.id.backButton);
+        mPauseButton = (Button) view.findViewById(R.id.pause_button);
 
         mPredictionView.setVisibility(View.GONE);
 
@@ -116,18 +130,21 @@ public class SetupFragment extends GameFragment {
             @Override
             public void onClick(View v){
                 onPercivalClicked();
+                toastMerlin();
                 setupSuggestions();
             }
         });
         mMordredCheckBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
+                toastMerlin();
                 setupSuggestions();
             }
         });
         mMorganaCheckBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
+                toastPercival();
                 setupSuggestions();
             }
         });
@@ -140,15 +157,30 @@ public class SetupFragment extends GameFragment {
         mAssassinCheckBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
+                toastMerlin();
                 setupSuggestions();
             }
         });
+
         mSubmitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onSubmitClicked();
             }
         });
+        mBackButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackClicked();
+            }
+        });
+        mPauseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onPauseClicked();
+            }
+        });
+
         mPredictionView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
@@ -158,6 +190,7 @@ public class SetupFragment extends GameFragment {
 
         return view;
     }
+
 
     @Override
     public void onAttach(Activity activity){
@@ -187,10 +220,18 @@ public class SetupFragment extends GameFragment {
         }
 
         if(!getSetupLeader(gameManagerClient)){
-            mTitleTextView.setText("Wait for setup leader to start the game.");
-            mCheckboxLayout.setVisibility(View.GONE);
-            mSubmitButton.setVisibility(View.GONE);
-            mPredictionView.setVisibility(View.GONE);
+            GameManagerState state = gameManagerClient.getCurrentState();
+            JSONObject gameData = state.getGameData();
+
+            String setupLeaderName = "setup leader";
+            try {
+                setupLeaderName = gameData.getString("setupLeaderName");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            mTitleTextView.setText("Wait for " + setupLeaderName + " to start the game.");
+            mLeaderLayout.setVisibility(View.GONE);
         }
     }
 
@@ -235,7 +276,7 @@ public class SetupFragment extends GameFragment {
     }
 
     /**
-     * Percival checkbox click listenr. Enable or disable checkbox for roles that depend on percival
+     * Percival checkbox click listener. Enable or disable checkbox for roles that depend on percival
      */
     private void onPercivalClicked() {
         if(mPercivalCheckBox.isChecked()){
@@ -245,6 +286,21 @@ public class SetupFragment extends GameFragment {
             mMorganaCheckBox.setEnabled(false);
 
         }
+    }
+
+    /**
+     * Back button click listener. Moves everyone back to lobby.
+     */
+    private void onBackClicked() {
+        ((MainActivity)mActivity).reset();
+    }
+
+    /**
+     * Pause button click listener.
+     */
+    private void onPauseClicked() {
+        ((MainActivity)mActivity).setPaused(true);
+        ((MainActivity)mActivity).updatePauseFragment(PAUSE_FRAGMENT);
     }
 
     /**
@@ -284,8 +340,7 @@ public class SetupFragment extends GameFragment {
                 Toast.makeText(mActivity, "You've selected too many evil roles", Toast.LENGTH_SHORT).show();
                 return;
             }
-            //update mRolesArray
-            //((MainActivity)mActivity).setRolesArray(rolesArray);
+
             // Send selected roles to the receiver
             JSONObject jsonMessage = new JSONObject();
             try {
@@ -294,19 +349,20 @@ public class SetupFragment extends GameFragment {
                 Log.e(TAG, "Error creating JSON message", e);
                 return;
             }
+
             PendingResult<GameManagerClient.GameManagerResult> result =
                     gameManagerClient.sendGameRequest(jsonMessage);
             result.setResultCallback(new ResultCallback<GameManagerClient.GameManagerResult>() {
                 @Override
                 public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
                     if (gameManagerResult.getStatus().isSuccess()) {
-                        Toast.makeText(mActivity, "Start Game was successful", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(mActivity, "Start Game was successful", Toast.LENGTH_SHORT).show();
                         ((MainActivity) mActivity)
                                 .setPlayerState(gameManagerClient.getCurrentState().getPlayer(
                                         gameManagerResult.getPlayerId()).getPlayerState());
 
                     } else {
-                        Toast.makeText(mActivity, "Something wrong????", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(mActivity, "Something went wrong!", Toast.LENGTH_SHORT).show();
                         mCastConnectionManager.disconnectFromReceiver(false);
                         Utils.showErrorDialog(mActivity,
                                 gameManagerResult.getStatus().getStatusMessage());
@@ -314,6 +370,20 @@ public class SetupFragment extends GameFragment {
                 }
             });
         }
+    }
+
+    /**
+     * If merlin or percival are not checked, toast saying they are required
+     */
+    private void toastMerlin(){
+        if(!mMerlinCheckBox.isChecked())
+            Toast.makeText(mActivity, "This role requires Merlin.", Toast.LENGTH_SHORT).show();
+    }
+
+    private void toastPercival(){
+        if(!mPercivalCheckBox.isChecked())
+            Toast.makeText(mActivity, "This role requires Percival.", Toast.LENGTH_SHORT).show();
+
     }
 
     private double[] merlin =   {.8, .85, .9, .95, .95, .95};

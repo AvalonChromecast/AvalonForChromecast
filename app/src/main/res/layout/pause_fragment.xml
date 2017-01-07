@@ -1,0 +1,55 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="edu.wisc.ece.avalonforchromecast.PauseFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <TextView
+        android:text="Paused"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/title"
+        android:textSize="72sp"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        android:textColor="@android:color/white" />
+
+    <Button
+        android:text="What does my role mean?"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/rolesButton"
+        android:layout_above="@+id/rulesButton"
+        android:layout_margin="10dp" />
+
+    <Button
+        android:text="Rules"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/rulesButton"
+        android:layout_above="@+id/resumeButton"
+        android:layout_margin="10dp" />
+
+    <Button
+        android:text="Resume Game"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/resumeButton"
+        android:background="@android:color/holo_green_dark"
+        android:layout_above="@+id/endButton"
+        android:textSize="36sp"
+        android:layout_margin="10dp" />
+
+    <Button
+        android:text="End Game"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/endButton"
+        android:background="@android:color/holo_red_dark"
+        android:layout_alignParentBottom="true"
+        android:textSize="36sp"
+        android:layout_margin="10dp" />
+
+</RelativeLayout>

@@ -1,56 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical"
     android:padding="15dp">
 
     <TextView
-        android:id="@+id/startHintView"
-        android:layout_width="199dp"
+        android:id="@+id/text_label"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Wait until everyone has joined to start!"
-        android:textSize="20sp"
-        android:gravity="center" />
+        android:text="Waiting for players..."
+        android:textSize="30sp"
+        android:layout_alignParentTop="false"
+        android:textColor="@android:color/white" />
 
     <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:padding="15dp"
-        android:id="@+id/inputLayout">
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="false"
+        android:layout_centerHorizontal="false"
+        android:layout_marginBottom="150dp"
+        android:layout_centerInParent="true">
 
-        <EditText
-            android:id="@+id/name"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="@string/enter_your_name"
-            android:inputType="textPersonName"
-            android:ellipsize="end"
-            android:maxLines="1">
-
-            <requestFocus/>
-        </EditText>
-
-        <ProgressBar
-            android:id="@+id/spinner"
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="gone">
-        </ProgressBar>
-        <Button
-            android:id="@+id/button_join_start"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/button_join"
+            android:orientation="horizontal"
+            android:padding="15dp"
+            android:id="@+id/name_layout"
+            android:gravity="center"
             android:layout_gravity="center">
-        </Button>
+
+            <EditText
+                android:id="@+id/name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="@string/enter_your_name"
+                android:inputType="textPersonName"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textSize="24sp">
+
+                <requestFocus/>
+            </EditText>
+
+            <Button
+                android:id="@+id/join_set_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/button_join"
+                android:layout_gravity="center"
+                android:layout_marginLeft="10dp">
+            </Button>
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/buttons_layout"
+            android:layout_gravity="center"
+            android:padding="15dp">
+
+            <Button
+                android:text="Back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/back_button"
+                android:layout_weight="1"
+                android:padding="20dp"
+                android:textSize="20sp" />
+
+            <Button
+                android:text="Start"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/start_button"
+                android:layout_weight="1"
+                android:padding="20dp"
+                android:textSize="20sp"
+                android:enabled="false" />
+        </LinearLayout>
     </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout>

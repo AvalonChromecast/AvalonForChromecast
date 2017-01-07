@@ -12,28 +12,53 @@
 
     <Button
         android:text="Hide"
-        android:layout_width="wrap_content"
+        android:layout_width="70dp"
         android:layout_height="wrap_content"
         android:id="@+id/showHideButton"
-        android:layout_alignParentRight="true" />
+        android:layout_alignParentRight="false" />
 
-    <TextView
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Your Role"
-        android:id="@+id/roleTextView"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
+        android:id="@+id/loyalty_role">
 
-        android:textStyle="bold" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Your Loyalty"
+            android:id="@+id/loyaltyTextView"
+            android:textStyle="bold"
+            android:textSize="24sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Your Role"
+            android:id="@+id/roleTextView"
+            android:textStyle="bold"
+            android:textSize="24sp" />
+    </LinearLayout>
+
+    <Button
+        android:text="..."
+        android:layout_height="50dp"
+        android:id="@+id/pause_button"
+        android:layout_weight="1"
+        android:layout_alignParentRight="true"
+        android:textSize="20sp"
+        android:layout_width="50dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/extraInfoContainer"
         android:orientation="vertical"
-        android:layout_below="@+id/roleTextView"
+        android:layout_below="@+id/loyalty_role"
         />
 
     <TextView
@@ -43,7 +68,9 @@
         android:layout_below="@+id/extraInfoContainer"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="11dp"
-        android:id="@+id/missionTeamSizeView" />
+        android:id="@+id/missionTeamSizeView"
+        android:textColor="@android:color/white"
+        android:textSize="24sp" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -52,8 +79,9 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="11dp"
         android:id="@+id/playHintView"
-        android:textSize="20sp"
-        android:gravity="center" />
+        android:textSize="24sp"
+        android:gravity="center"
+        android:textColor="@android:color/white" />
 
     <Button
         android:text="Submit"
@@ -61,7 +89,9 @@
         android:layout_height="wrap_content"
         android:id="@+id/submitSelectionButton"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:textSize="20sp"
+        android:padding="20dp" />
 
     <Button
         android:text="Submit"
@@ -69,7 +99,9 @@
         android:layout_height="wrap_content"
         android:id="@+id/submitAssassinButton"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:padding="20dp"
+        android:textSize="20sp" />
 
     <Button
         android:layout_width="wrap_content"
@@ -77,7 +109,9 @@
         android:text="Approve"
         android:id="@+id/approveSelectionButton"
         android:layout_alignParentBottom="true"
-        android:background="@android:color/holo_green_dark"/>
+        android:background="@android:color/holo_green_dark"
+        android:textSize="20sp"
+        android:padding="20dp" />
 
     <Button
         android:layout_width="wrap_content"
@@ -86,7 +120,9 @@
         android:id="@+id/rejectSelectionButton"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:background="@android:color/holo_red_dark"/>
+        android:background="@android:color/holo_red_dark"
+        android:padding="20dp"
+        android:textSize="20sp" />
 
     <Button
         android:layout_width="wrap_content"
@@ -94,7 +130,9 @@
         android:text="Pass"
         android:id="@+id/passMissionButton"
         android:layout_alignParentBottom="true"
-        android:background="@android:color/holo_green_dark"/>
+        android:background="@android:color/holo_green_dark"
+        android:textSize="20sp"
+        android:padding="20dp" />
 
     <Button
         android:layout_width="wrap_content"
@@ -103,7 +141,9 @@
         android:id="@+id/failMissionButton"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:background="@android:color/holo_red_dark"/>
+        android:background="@android:color/holo_red_dark"
+        android:textSize="20sp"
+        android:padding="20dp" />
 
     <ScrollView
         android:layout_width="match_parent"

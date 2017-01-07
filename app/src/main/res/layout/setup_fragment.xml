@@ -1,81 +1,120 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="15dp">
 
     <TextView
         android:text="Choose Roles you want to play with!"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/titleTextView"
         android:textSize="30sp"
-        android:layout_marginTop="10dp"
-        android:textAlignment="center"
-        android:gravity="center" />
-
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/titleTextView"
-        android:id="@+id/checkboxLayout">
-
-        <CheckBox
-            android:text="Merlin"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/merlinCheckbox"
-            android:textSize="14sp" />
-
-        <CheckBox
-            android:text="Assassin"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/assassinCheckbox" />
-
-        <CheckBox
-            android:text="Percival"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/percivalCheckbox" />
-
-        <CheckBox
-            android:text="Mordred"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/mordredCheckbox" />
-
-        <CheckBox
-            android:text="Oberon"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/oberonCheckbox" />
-
-        <CheckBox
-            android:text="Morgana"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/morganaCheckbox" />
-
-
-    </LinearLayout>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/predictionView"
-        android:layout_above="@+id/submitButton"
-        android:layout_marginBottom="50dp" />
+        android:textColor="@android:color/white"
+        android:layout_weight="1"
+        android:layout_marginRight="70dp"
+        android:layout_marginBottom="10dp" />
 
     <Button
-        android:text="Start Game"
+        android:text="..."
+        android:layout_height="50dp"
+        android:id="@+id/pause_button"
+        android:layout_weight="1"
+        android:layout_alignParentRight="true"
+        android:textSize="20sp"
+        android:layout_width="50dp" />
+
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/submitButton"
-        android:layout_gravity="bottom"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="20dp"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/titleTextView"
+        android:id="@+id/leaderLayout">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/checkboxLayout">
+
+            <CheckBox
+                android:text="Merlin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/merlinCheckbox"
+                android:textSize="14sp" />
+
+            <CheckBox
+                android:text="Assassin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/assassinCheckbox" />
+
+            <CheckBox
+                android:text="Percival"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/percivalCheckbox" />
+
+            <CheckBox
+                android:text="Mordred"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/mordredCheckbox" />
+
+            <CheckBox
+                android:text="Oberon"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/oberonCheckbox" />
+
+            <CheckBox
+                android:text="Morgana"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/morganaCheckbox" />
+
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/predictionView"
+            android:layout_above="@+id/buttons"
+            android:layout_marginBottom="50dp"
+            android:layout_alignParentBottom="false" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="20dp"
+            android:id="@+id/buttons">
+
+            <Button
+                android:text="Back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/backButton"
+                android:layout_weight="1"
+                android:padding="20dp"
+                android:textSize="20sp" />
+
+            <Button
+                android:text="Start"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/submitButton"
+                android:layout_alignParentBottom="false"
+                android:layout_centerHorizontal="false"
+                android:padding="20dp"
+                android:textSize="20sp"
+                android:layout_weight="1" />
+        </LinearLayout>
+    </RelativeLayout>
 
 </RelativeLayout>

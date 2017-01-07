@@ -118,31 +118,6 @@ public class GameOverFragment extends GameFragment{
      * Lobby button click listener. Move the players back to lobby.
      */
     public void onLobbyButtonClicked(){
-        final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
-        GameManagerState state = gameManagerClient.getCurrentState();
-        JSONObject gameData = state.getGameData();
-
-        JSONObject reset = new JSONObject();
-        try {
-            reset.put("reset", true);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        PendingResult<GameManagerClient.GameManagerResult> result =
-                gameManagerClient.sendGameRequest(reset);
-        result.setResultCallback(new ResultCallback<GameManagerClient.GameManagerResult>() {
-            @Override
-            public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
-                if (gameManagerResult.getStatus().isSuccess()) {
-                    ((MainActivity) mActivity).setPlayerState(gameManagerClient.getCurrentState().getPlayer(
-                            gameManagerResult.getPlayerId()).getPlayerState());
-                }
-                else {
-
-                }
-            }
-        });
-
+        ((MainActivity)mActivity).reset();
     }
 }

@@ -12,7 +12,7 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.MediaRouteActionProvider;
 import android.support.v7.app.MediaRouteButton;
-import android.support.v7.widget.Toolbar;
+
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -49,6 +49,9 @@ public class MainActivity extends AppCompatActivity implements Observer {
     // local copy of player's loyalty
     private String mLoyalty;
 
+    // wether player is in options menu or not
+    private boolean mPaused;
+
     // CastConnectionManager object takes care of all code needed to connect to Chromecast
     private CastConnectionManager mCastConnectionManager;
 
@@ -59,6 +62,11 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private static final int LOBBY_PHASE = 0;
     private static final int SETUP_PHASE = 1;
     private static final int GAMEOVER_PHASE = 6;
+
+    // enums for pause fragments
+    private static final int PAUSE_FRAGMENT = 0;
+    private static final int ROLES_FRAGMENT = 1;
+    private static final int RULES_FRAGMENT = 2;
 
 
     @Override
@@ -148,6 +156,36 @@ public class MainActivity extends AppCompatActivity implements Observer {
     }
 
     /**
+     * Called by various fragments to move the game phase back to the lobby
+     */
+    public void reset(){
+        final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
+        GameManagerState state = gameManagerClient.getCurrentState();
+
+        JSONObject reset = new JSONObject();
+        try {
+            reset.put("reset", true);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        PendingResult<GameManagerClient.GameManagerResult> result =
+                gameManagerClient.sendGameRequest(reset);
+        result.setResultCallback(new ResultCallback<GameManagerClient.GameManagerResult>() {
+            @Override
+            public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
+                if (gameManagerResult.getStatus().isSuccess()) {
+                    setPlayerState(gameManagerClient.getCurrentState().getPlayer(
+                            gameManagerResult.getPlayerId()).getPlayerState());
+                }
+                else {
+                    Log.d(TAG, "Error during reset()");
+                }
+            }
+        });
+    }
+
+    /**
      * when this function is called, it updates which fragment is active based on what the current
      * player state and game phase is
      */
@@ -161,19 +199,20 @@ public class MainActivity extends AppCompatActivity implements Observer {
             fragment = mCastConnectionFragment;
         } else {
             GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
-            if(gameManagerClient == null){
+            if(gameManagerClient == null || mPaused){
                 return;
             }
             GameManagerState state = gameManagerClient.getCurrentState();
             JSONObject gameData = state.getGameData();
 
             int gamePhase = LOBBY_PHASE;
-
             try {
                 gamePhase = gameData.getInt("phase");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+
+            Log.d(TAG, "gameData: " + gameData.toString());
 
             if (mPlayerState == GameManagerClient.PLAYER_STATE_PLAYING) {
                 Log.d(TAG, "Player State is PLAYING");
@@ -186,13 +225,49 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 else{
                     fragment = mPlayingFragment;
                 }
+            } else if(mPlayerState == GameManagerClient.PLAYER_STATE_QUIT ||
+                    mPlayerState == GameManagerClient.PLAYER_STATE_DROPPED){
+                Log.d(TAG, "Player State is QUIT or DROPPED");
+                fragment = mCastConnectionFragment;
             }
-            //this happens when player state is ready or game phase is LOBBY_PHASE
             else {
                 Log.d(TAG, "Player State is READY or AVAILABLE");
                     fragment = mLobbyFragment;
             }
         }
+        getFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .commitAllowingStateLoss();
+    }
+
+    public void updatePauseFragment(int pauseFragmentId){
+        if (isChangingConfigurations() || isFinishing() || isDestroyed()) {
+            return;
+        }
+        Fragment fragment;
+        if (!mCastConnectionManager.isConnectedToReceiver()) {
+            mPlayerName = null;
+            fragment = mCastConnectionFragment;
+        } else {
+            GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
+            if (gameManagerClient == null) {
+                return;
+            }
+            switch (pauseFragmentId) {
+                case PAUSE_FRAGMENT:
+                    fragment = new PauseFragment();
+                    break;
+                case ROLES_FRAGMENT:
+                    return;
+                case RULES_FRAGMENT:
+                    return;
+                default:
+                    Log.d(TAG, "Attempted to update non-existent pause fragment!");
+                    return;
+            }
+        }
+
         getFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, fragment)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
@@ -245,5 +320,9 @@ public class MainActivity extends AppCompatActivity implements Observer {
     {
         mMediaRouteButton = mediaRouteButton;
         mCastConnectionManager.setMediaRouteButton(mediaRouteButton);
+    }
+
+    public void setPaused(boolean p){
+        mPaused = p;
     }
 }
