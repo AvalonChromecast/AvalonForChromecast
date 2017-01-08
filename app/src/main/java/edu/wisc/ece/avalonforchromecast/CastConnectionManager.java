@@ -18,7 +18,6 @@ import android.support.v7.app.MediaRouteButton;
 import android.support.v7.media.MediaRouteSelector;
 import android.support.v7.media.MediaRouter;
 import android.support.v7.media.MediaRouter.RouteInfo;
-import android.util.Log;
 import android.view.View;
 
 import java.util.Observable;
@@ -163,7 +162,7 @@ public class CastConnectionManager extends Observable {
     }
 
     private void setSelectedDevice(CastDevice device) {
-        Log.d(TAG, "setSelectedDevice: " + device);
+        //Log.d(TAG, "setSelectedDevice: " + device);
         mSelectedDevice = device;
 
         // This will notify observers, so no need to explicitly do it in this method.
@@ -173,7 +172,7 @@ public class CastConnectionManager extends Observable {
             try {
                 connectApiClient();
             } catch (IllegalStateException e) {
-                Log.e(TAG, "Exception while connecting Google API client. ", e);
+                //Log.e(TAG, "Exception while connecting Google API client. ", e);
                 disconnectApiClient();
             }
         } else {
@@ -196,14 +195,14 @@ public class CastConnectionManager extends Observable {
 
         @Override
         public void onRouteSelected(MediaRouter router, RouteInfo info) {
-            Log.d(TAG, "MediaRouteCallback.onRouteSelected: info=" + info);
+            //Log.d(TAG, "MediaRouteCallback.onRouteSelected: info=" + info);
             CastDevice device = CastDevice.getFromBundle(info.getExtras());
             setSelectedDevice(device);
         }
 
         @Override
         public void onRouteUnselected(MediaRouter router, RouteInfo info) {
-            Log.d(TAG, "MediaRouteCallback.onRouteUnselected: info=" + info);
+            //Log.d(TAG, "MediaRouteCallback.onRouteUnselected: info=" + info);
             setSelectedDevice(null);
         }
     }
@@ -216,16 +215,16 @@ public class CastConnectionManager extends Observable {
 
         @Override
         public void onConnectionSuspended(int cause) {
-            Log.d(TAG, "GoogleApiClient disconnected. Cause: " + cause);
+            //Log.d(TAG, "GoogleApiClient disconnected. Cause: " + cause);
             setSelectedDevice(null);
         }
 
         @Override
         public void onConnected(Bundle connectionHint) {
-            Log.d(TAG, "GoogleApiClient connected.");
+            //Log.d(TAG, "GoogleApiClient connected.");
             if (!isApiClientConnected()) {
-                Log.w(TAG, "Got GoogleApiClient.onConnected callback but the Google API client is "
-                        + "disconnected.");
+                //Log.w(TAG, "Got GoogleApiClient.onConnected callback but the Google API client is "
+//                        + "disconnected.");
                 setSelectedDevice(null);
                 return;
             }
@@ -235,7 +234,7 @@ public class CastConnectionManager extends Observable {
 
         @Override
         public void onConnectionFailed(ConnectionResult result) {
-            Log.d(TAG, "Failed to connect the Google API client " + result);
+            //Log.d(TAG, "Failed to connect the Google API client " + result);
             setSelectedDevice(null);
         }
     }
@@ -247,7 +246,7 @@ public class CastConnectionManager extends Observable {
 
         @Override
         public void onApplicationDisconnected(int statusCode) {
-            Log.d(TAG, "Cast.Listener.onApplicationDisconnected: " + statusCode);
+            //Log.d(TAG, "Cast.Listener.onApplicationDisconnected: " + statusCode);
             setSelectedDevice(null);
         }
     }
@@ -260,12 +259,12 @@ public class CastConnectionManager extends Observable {
             Status status = result.getStatus();
             if (status.isSuccess()) {
                 ApplicationMetadata appMetaData = result.getApplicationMetadata();
-                Log.d(TAG, "Launching game: " + appMetaData.getName());
+                //Log.d(TAG, "Launching game: " + appMetaData.getName());
                 mCastSessionId = result.getSessionId();
                 GameManagerClient.getInstanceFor(mApiClient, mCastSessionId).setResultCallback(
                         new GameManagerGetInstanceCallback());
             } else {
-                Log.d(TAG, "Unable to launch the the game. statusCode: " + status.getStatusCode());
+                //Log.d(TAG, "Unable to launch the the game. statusCode: " + status.getStatusCode());
                 setSelectedDevice(null);
             }
         }
@@ -280,9 +279,9 @@ public class CastConnectionManager extends Observable {
         @Override
         public void onResult(GameManagerInstanceResult gameManagerResult) {
             if (!gameManagerResult.getStatus().isSuccess()) {
-                Log.d(TAG, "Unable to initialize the GameManagerClient: "
-                        + gameManagerResult.getStatus().getStatusMessage()
-                        + " Status code: " + gameManagerResult.getStatus().getStatusCode());
+                //Log.d(TAG, "Unable to initialize the GameManagerClient: "
+//                        + gameManagerResult.getStatus().getStatusMessage()
+//                        + " Status code: " + gameManagerResult.getStatus().getStatusCode());
                 setSelectedDevice(null);
                 return;
             }

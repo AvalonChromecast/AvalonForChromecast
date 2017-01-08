@@ -2,6 +2,7 @@ package edu.wisc.ece.avalonforchromecast;
 
 import com.google.android.gms.cast.games.GameManagerClient;
 import com.google.android.gms.cast.games.GameManagerState;
+import com.google.android.gms.cast.games.PlayerInfo;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 
@@ -10,15 +11,15 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.List;
 
 /**
  * A fragment displayed while the player is in the game lobby.
@@ -34,6 +35,10 @@ public class LobbyFragment extends GameFragment {
     private Button mStartButton;
 
     private Activity mActivity;
+
+    // min/max players enums
+    private static int MIN_PLAYERS = 5;
+    private static int MAX_PLAYERS = 10;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -142,8 +147,13 @@ public class LobbyFragment extends GameFragment {
                 Toast.makeText(mActivity, "Please wait until the game is finished", Toast.LENGTH_SHORT).show();
             }
             else{
-                ((MainActivity) mActivity).setPlayerName(mNameEditText.getText().toString());
-                sendStartGameRequest();
+                List<PlayerInfo> players = state.getPlayersInState(GameManagerClient.PLAYER_STATE_READY);
+                if(players.size() < MIN_PLAYERS || players.size() > MAX_PLAYERS){
+                    Toast.makeText(mActivity, "Please have " + MIN_PLAYERS + " to " + MAX_PLAYERS +
+                            " players", Toast.LENGTH_SHORT).show();
+                } else {
+                    sendStartGameRequest();
+                }
             }
         }
         updateView();
@@ -160,7 +170,7 @@ public class LobbyFragment extends GameFragment {
             try {
                 jsonMessage.put("playerName", mNameEditText.getText().toString());
             } catch (JSONException e) {
-                Log.e(TAG, "Error creating JSON message", e);
+                //Log.e(TAG, "Error creating JSON message", e);
                 return;
             }
             PendingResult<GameManagerClient.GameManagerResult> result =
@@ -173,10 +183,10 @@ public class LobbyFragment extends GameFragment {
                         try {
                             jsonMessage2.put("updatePlayerList", true);
                         } catch (JSONException e){
-                            Log.e(TAG, "Error creating JSON message", e);
+                            //Log.e(TAG, "Error creating JSON message", e);
                             return;
                         }
-                        Log.d(TAG, "sent updatePlayerList signal");
+                        //Log.d(TAG, "sent updatePlayerList signal");
                         gameManagerClient.sendGameMessage(jsonMessage2);
                         ((MainActivity) mActivity)
                                 .setPlayerState(gameManagerClient.getCurrentState().getPlayer(
@@ -206,7 +216,7 @@ public class LobbyFragment extends GameFragment {
             try {
                 jsonMessage.put("startGame", "true");
             } catch (JSONException e) {
-                Log.e(TAG, "Error creating JSON message", e);
+                //Log.e(TAG, "Error creating JSON message", e);
                 return;
             }
             PendingResult<GameManagerClient.GameManagerResult> result =
@@ -215,14 +225,11 @@ public class LobbyFragment extends GameFragment {
                 @Override
                 public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
                     if (gameManagerResult.getStatus().isSuccess()) {
-                        //Toast.makeText(mActivity, "Start Game success, you're setup leader", Toast.LENGTH_SHORT).show();
+                        //Log.d(TAG, "Start Game success, you're setup leader");
                         ((MainActivity) mActivity)
                                 .setPlayerState(gameManagerClient.getCurrentState().getPlayer(
                                         gameManagerResult.getPlayerId()).getPlayerState());
-                    } else if(gameManagerResult.getStatus().getStatusCode() == GameManagerClient.STATUS_TOO_MANY_PLAYERS){
-                        Toast.makeText(mActivity, "Please have 5 to 10 players", Toast.LENGTH_SHORT).show();
-                    }
-                    else {
+                    } else {
                         mCastConnectionManager.disconnectFromReceiver(false);
                         Utils.showErrorDialog(mActivity,
                                 gameManagerResult.getStatus().getStatusMessage());
@@ -245,7 +252,7 @@ public class LobbyFragment extends GameFragment {
             try {
                 jsonMessage.put("playerName", mNameEditText.getText().toString());
             } catch (JSONException e) {
-                Log.e(TAG, "Error creating JSON message", e);
+                //Log.e(TAG, "Error creating JSON message", e);
                 return;
             }
             PendingResult<GameManagerClient.GameManagerResult> result =
@@ -304,7 +311,7 @@ public class LobbyFragment extends GameFragment {
      */
     @Override
     public void onStateChanged(GameManagerState newState, GameManagerState oldState){
-        Log.d(TAG, "Enter lobbyfragment's onStateChanged");
+        //Log.d(TAG, "Enter lobbyfragment's onStateChanged");
         String playerId = ((MainActivity) mActivity).getPlayerId();
         if(newState.hasPlayerStateChanged(playerId, oldState)){
             ((MainActivity) mActivity).setPlayerState(newState.getPlayer(

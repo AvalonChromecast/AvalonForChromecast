@@ -15,7 +15,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Vibrator;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -193,7 +192,7 @@ public class PlayingFragment extends GameFragment{
 
         final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
         if(gameManagerClient == null){
-            Log.d(TAG, "gameManagerClient in onStart is somehow null.");
+            //Log.d(TAG, "gameManagerClient in onStart is somehow null.");
             return;
         }
         GameManagerState state = gameManagerClient.getCurrentState();
@@ -235,7 +234,7 @@ public class PlayingFragment extends GameFragment{
                 int gamePhase = -1;
                 try {
                     gamePhase = gameData.getInt("phase");
-                    Log.d(TAG, "game phase:" + gamePhase);
+                    //Log.d(TAG, "game phase:" + gamePhase);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -265,7 +264,7 @@ public class PlayingFragment extends GameFragment{
         //display loyalty
         PlayerInfo player = gameState.getPlayer(((MainActivity) mActivity).getPlayerId());
         if(player == null){
-            Log.d(TAG, "player is somehow null in initialize()");
+            //Log.d(TAG, "player is somehow null in initialize()");
             return;
         }
         List<PlayerInfo> players = gameState.getPlayersInState(GameManagerClient.PLAYER_STATE_PLAYING);
@@ -328,7 +327,7 @@ public class PlayingFragment extends GameFragment{
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                Log.d(TAG, "Current player's role: " + currPlayerRole);
+                //Log.d(TAG, "Current player's role: " + currPlayerRole);
                 if(currPlayerLoyalty.equals("evil") && !myPlayerId.equals(currPlayerId)){
                     if( !((isEvil && currPlayerRole.equals(OBERON)) ||(isMerlin && currPlayerRole.equals(MORDRED)))) {
                         addExtraInfo(currPlayerName);
@@ -383,7 +382,7 @@ public class PlayingFragment extends GameFragment{
      * and a submit button. Non-leaders get no display.
      */
     public void selectionPhase(GameManagerState gameState, JSONObject gameData){
-        Log.d(TAG, "gameData: " + gameData.toString());
+        //Log.d(TAG, "gameData: " + gameData.toString());
 
         mApproveSelectionButton.setVisibility(View.GONE);
         mRejectSelectionButton.setVisibility(View.GONE);
@@ -416,13 +415,13 @@ public class PlayingFragment extends GameFragment{
             //make radio button for each player
             for (int i = 0; i < players.size(); i++) {
                 PlayerInfo player = players.get(i);
-                Log.d(TAG, "playerData: " + player.getPlayerData().toString());
+                //Log.d(TAG, "playerData: " + player.getPlayerData().toString());
                 String playerName = "";
                 try {
                     playerName = player.getPlayerData().getString("name");
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Log.e(TAG, "Unable to access 'name' from PlayerInfo");
+                    //Log.e(TAG, "Unable to access 'name' from PlayerInfo");
                 }
                 ToggleButton playerButton = new ToggleButton(mActivity);
                 playerButton.setText(playerName);
@@ -586,7 +585,7 @@ public class PlayingFragment extends GameFragment{
             //make radio button for each player
             for (int i = 0; i < players.size(); i++) {
                 PlayerInfo player = players.get(i);
-                Log.d(TAG, "playerData: " + player.getPlayerData().toString());
+                //Log.d(TAG, "playerData: " + player.getPlayerData().toString());
                 String playerLoyalty = "";
                 String playerName = "";
                 try {
@@ -594,7 +593,7 @@ public class PlayingFragment extends GameFragment{
                     playerName = player.getPlayerData().getString("name");
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Log.e(TAG, "Unable to access 'name' from PlayerInfo");
+                    //Log.e(TAG, "Unable to access 'name' from PlayerInfo");
                 }
                 if(playerLoyalty.equals("good")) {
                     RadioButton playerButton = new RadioButton(mActivity);
@@ -683,7 +682,7 @@ public class PlayingFragment extends GameFragment{
         try {
             missionTeam.put("missionTeam", new JSONArray(selectedPlayers));
             for(String player: selectedPlayers){
-                Log.d(TAG, "selectedPlayers: " + player );
+                //Log.d(TAG, "selectedPlayers: " + player );
             }
 
         } catch (JSONException e) {

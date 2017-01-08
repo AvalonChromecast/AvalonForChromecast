@@ -9,7 +9,6 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
-import android.util.Log;
 
 import java.util.Observable;
 import java.util.Observer;

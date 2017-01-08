@@ -66,22 +66,19 @@ limitations under the License.
     </FrameLayout>
 
     <RelativeLayout
-        android:padding="20dp"
-        android:layout_height="wrap_content"
         android:layout_gravity="bottom|center"
         android:layout_marginBottom="100dp"
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
+        android:elevation="2dp"
         android:background="@android:color/holo_green_dark"
-        android:elevation="2dp">
+        android:layout_height="80dp">
 
         <android.support.v7.app.MediaRouteButton
             android:id="@+id/media_route_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="200dp"
             android:mediaRouteTypes="user"
-            android:visibility="gone"
-            android:paddingRight="100dp"
-            android:elevation="0dp" />
+            android:paddingRight="130dp"
+            android:layout_height="80dp" />
 
         <TextView
             android:text="Connect"
@@ -91,7 +88,11 @@ limitations under the License.
             android:layout_weight="1"
             android:textSize="30sp"
             android:layout_centerInParent="false"
-            android:layout_marginLeft="50dp" />
+            android:layout_centerHorizontal="false"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="20dp"
+            android:textColor="@android:color/white" />
 
     </RelativeLayout>
 

@@ -13,7 +13,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.MediaRouteActionProvider;
 import android.support.v7.app.MediaRouteButton;
 
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -104,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         MediaRouteActionProvider mediaRouteActionProvider =
                 (MediaRouteActionProvider) MenuItemCompat.getActionProvider(mediaRouteMenuItem);
         if (mediaRouteActionProvider == null) {
-            Log.w(TAG, "mediaRouteActionProvider is null!");
+            //Log.w(TAG, "mediaRouteActionProvider is null!");
             return false;
         }
         mediaRouteActionProvider.setRouteSelector(mCastConnectionManager.getMediaRouteSelector());
@@ -139,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 @Override
                 public void onResult(final GameManagerClient.GameManagerResult gameManagerResult) {
                     if (gameManagerResult.getStatus().isSuccess()) {
-                        Log.d(TAG, "Player ID: " + gameManagerResult.getPlayerId());
+                        //Log.d(TAG, "Player ID: " + gameManagerResult.getPlayerId());
                         mPlayerId = gameManagerResult.getPlayerId();
                         mPlayerState = gameManagerClient.getCurrentState().getPlayer(
                                 gameManagerResult.getPlayerId()).getPlayerState();
@@ -179,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
                             gameManagerResult.getPlayerId()).getPlayerState());
                 }
                 else {
-                    Log.d(TAG, "Error during reset()");
+                    //Log.d(TAG, "Error during reset()");
                 }
             }
         });
@@ -212,10 +211,10 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 e.printStackTrace();
             }
 
-            Log.d(TAG, "gameData: " + gameData.toString());
+            //Log.d(TAG, "gameData: " + gameData.toString());
 
             if (mPlayerState == GameManagerClient.PLAYER_STATE_PLAYING) {
-                Log.d(TAG, "Player State is PLAYING");
+                //Log.d(TAG, "Player State is PLAYING");
                 if(gamePhase == SETUP_PHASE){
                     fragment = new SetupFragment();
                 }
@@ -227,11 +226,11 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 }
             } else if(mPlayerState == GameManagerClient.PLAYER_STATE_QUIT ||
                     mPlayerState == GameManagerClient.PLAYER_STATE_DROPPED){
-                Log.d(TAG, "Player State is QUIT or DROPPED");
+                //Log.d(TAG, "Player State is QUIT or DROPPED");
                 fragment = mCastConnectionFragment;
             }
             else {
-                Log.d(TAG, "Player State is READY or AVAILABLE");
+                //Log.d(TAG, "Player State is READY or AVAILABLE");
                     fragment = mLobbyFragment;
             }
         }
@@ -263,7 +262,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 case RULES_FRAGMENT:
                     return;
                 default:
-                    Log.d(TAG, "Attempted to update non-existent pause fragment!");
+                    //Log.d(TAG, "Attempted to update non-existent pause fragment!");
                     return;
             }
         }
@@ -289,7 +288,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     }
 
     public void setPlayerState(int state) {
-        Log.d(TAG, "setting player state: " + state);
+        //Log.d(TAG, "setting player state: " + state);
         mPlayerState = state;
         updateFragments();
     }

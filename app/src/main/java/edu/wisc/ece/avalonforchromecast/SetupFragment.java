@@ -12,7 +12,6 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -215,7 +214,7 @@ public class SetupFragment extends GameFragment {
         // display buttons if setup leader, else display only title
         final GameManagerClient gameManagerClient = mCastConnectionManager.getGameManagerClient();
         if(gameManagerClient == null){
-            Log.d(TAG, "gameManagerClient in onStart is somehow null.");
+            //Log.d(TAG, "gameManagerClient in onStart is somehow null.");
             return;
         }
 
@@ -250,7 +249,7 @@ public class SetupFragment extends GameFragment {
         }
 
         String playerID = ((MainActivity)mActivity).getPlayerId();
-        Log.d(TAG,"playerID, setupLeaderID: " + playerID + ", " + setupLeaderID);
+        //Log.d(TAG,"playerID, setupLeaderID: " + playerID + ", " + setupLeaderID);
         return playerID.equals(setupLeaderID);
 
     }
@@ -335,7 +334,7 @@ public class SetupFragment extends GameFragment {
             GameManagerState state = gameManagerClient.getCurrentState();
             List<PlayerInfo> players = state.getPlayersInState(GameManagerClient.PLAYER_STATE_PLAYING);
             int maxEvilChecked = (int)Math.ceil((double)players.size() / 3);
-            Log.d(TAG, "numEvil, maxEvil: " + numEvilChecked + ", " + maxEvilChecked);
+            //Log.d(TAG, "numEvil, maxEvil: " + numEvilChecked + ", " + maxEvilChecked);
             if(numEvilChecked > maxEvilChecked){
                 Toast.makeText(mActivity, "You've selected too many evil roles", Toast.LENGTH_SHORT).show();
                 return;
@@ -346,7 +345,7 @@ public class SetupFragment extends GameFragment {
             try {
                 jsonMessage.put("selectedRoles", new JSONArray((selectedRoles)));
             } catch (JSONException e) {
-                Log.e(TAG, "Error creating JSON message", e);
+                //Log.e(TAG, "Error creating JSON message", e);
                 return;
             }
 
@@ -538,7 +537,7 @@ public class SetupFragment extends GameFragment {
                                 suggestion = "Try selecting Oberon";
                             break;
                         default:
-                            Log.e(TAG, "error???");
+                            //Log.e(TAG, "error???");
                             break;
                     }
                 }
